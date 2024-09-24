@@ -456,7 +456,7 @@ class _LoginPageState extends State<LoginPage> {
                         login();
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF6F61EF),
+                        backgroundColor: Color(0xFF6F61EF),
                         padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                         fixedSize: Size(300, 50),
                       ),
