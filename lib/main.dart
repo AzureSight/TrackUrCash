@@ -1,5 +1,5 @@
 import 'package:finalproject_cst9l/firebase_options.dart';
-import 'package:finalproject_cst9l/auth/authenticator.dart';
+import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  NotificationService().initNotification();
   runApp(const MyApp());
 }
 
