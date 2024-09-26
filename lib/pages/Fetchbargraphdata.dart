@@ -42,7 +42,9 @@ class MyBarGraph extends StatelessWidget {
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
-                    showTitles: true, getTitlesWidget: getBottomTitles),
+                  showTitles: true,
+                  getTitlesWidget: getBottomTitles,
+                ),
               ),
             ),
             barGroups: [

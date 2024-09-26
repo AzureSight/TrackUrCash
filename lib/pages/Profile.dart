@@ -66,7 +66,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F61EF),
+        backgroundColor: const Color(0xFF23cc71),
         automaticallyImplyLeading: false,
         title: const Text(
           'Profile',

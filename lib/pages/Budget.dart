@@ -1,6 +1,9 @@
 // ignore: file_names
 
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/pages/AllExpenses.dart';
 import 'package:finalproject_cst9l/pages/Refreshamount.dart';
 import 'package:finalproject_cst9l/pages/Dashboard.dart';
 import 'package:finalproject_cst9l/pages/Expenses.dart';
@@ -30,7 +33,6 @@ class _BudgetState extends State<Budget> {
   //     // Update your state here to refresh the page
   //   });
   // }
-
   void openNoteBox() {
     showDialog(
       context: context,
@@ -86,6 +88,7 @@ class _BudgetState extends State<Budget> {
                       fontFamily: 'Ubuntu',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                     hintText: 'Set your Budget',
                     hintStyle: const TextStyle(
@@ -102,7 +105,7 @@ class _BudgetState extends State<Budget> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0xFF6F61EF),
+                        color: Color(0xFF23cc71),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -162,8 +165,8 @@ class _BudgetState extends State<Budget> {
                         Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
+                        backgroundColor: Colors.white,
+                        elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
@@ -171,7 +174,7 @@ class _BudgetState extends State<Budget> {
                       child: const Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Color(0xFF4533EA),
+                          color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -183,7 +186,7 @@ class _BudgetState extends State<Budget> {
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: const Color(0xFF4533EA),
+                      color: Colors.white,
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0xFF33000000),
@@ -202,8 +205,8 @@ class _BudgetState extends State<Budget> {
                         //
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
+                        backgroundColor: const Color(0xFF23cc71),
+                        elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
@@ -388,12 +391,99 @@ class _BudgetState extends State<Budget> {
 
   @override
   Widget build(BuildContext context) {
-    double remaining = budget - tot;
+    double remaining;
+    if (budget == 0) {
+      remaining = 0;
+    } else {
+      remaining = budget - tot;
+    }
+
     double roundedRemaining = double.parse(remaining.toStringAsFixed(2));
+    double savings = remaining;
+    double expensePercentage = (tot / budget) * 100;
+    // Lists of messages
+    List<String> withinBudgetMessages = [
+      "Great job! You've stayed within your budget and saved {savings} pesos. Consider putting this towards your savings or future expenses!",
+      "Awesome work! Not only did you manage your expenses well, but you also saved {savings} pesos. Keep it up and watch those small savings add up!",
+      "You're doing fantastic! By sticking to your budget, you've managed to save {savings} pesos. Treat yourself or save it for something bigger!"
+    ];
+
+    List<String> exceedBudgetMessages = [
+      "Uh-oh! Your expenses have exceeded your budget. Consider reviewing your spending to identify areas for adjustment.",
+      "Looks like you're over your budget. Take a moment to review your expenses and see where you can cut back.",
+      "Your current expenses are over your budget limit. Don’t worry! It’s a great opportunity to reassess your spending habits and find ways to save."
+    ];
+
+    // Function to get a random message
+    String getRandomMessage(List<String> messages, savings) {
+      final random = Random();
+      String message = messages[random.nextInt(messages.length)];
+      // Replace "{savings}" in the message with the actual savings value
+      return message.replaceAll("{savings}", savings.toStringAsFixed(2));
+    }
+
+    // Determine which list of messages to use
+    String message;
+    if (roundedRemaining >= 0) {
+      message = getRandomMessage(withinBudgetMessages, remaining);
+    } else {
+      message = getRandomMessage(exceedBudgetMessages, remaining);
+    }
+    void openReminderBox(BuildContext context) {
+      String reminderMessage =
+          "Reminder: Keep an eye on your expenses every day to stay within your budget!";
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              "Reminder!",
+              style: TextStyle(
+                fontFamily: 'Ubuntu',
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF001F3F),
+              ),
+            ),
+            content: Text(
+              message,
+              style: TextStyle(
+                fontFamily: 'Ubuntu',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFF23CC71), // Green background
+                  foregroundColor: Colors.white, // White text
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12), // Add padding if needed
+                ),
+                child: Text(
+                  "Got it!",
+                  style: TextStyle(
+                    fontFamily: 'Ubuntu', // Use Ubuntu font
+                    fontSize: 16, // Adjust font size as needed
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     print(roundedRemaining);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F61EF),
+        backgroundColor: const Color(0xFF23cc71),
         automaticallyImplyLeading: false,
         title: const Text(
           'Budget',
@@ -410,7 +500,7 @@ class _BudgetState extends State<Budget> {
       ),
       body: ListView(
         children: [
-          //SET TODAY'S BUDGET BUTTON
+          //SET BUDGET BUTTON
           Align(
             alignment: const AlignmentDirectional(0.00, 0.00),
             child: Padding(
@@ -436,12 +526,13 @@ class _BudgetState extends State<Budget> {
                                 onPressed: openNoteBox,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF23CC71),
+                                  elevation: 10,
                                   padding:
                                       const EdgeInsets.fromLTRB(24, 0, 24, 0),
                                   fixedSize: const Size(300, 60),
                                 ),
                                 child: const Text(
-                                  "Set Today's Budget",
+                                  "Set Budget",
                                   style: TextStyle(
                                     fontFamily: 'Readex Pro',
                                     fontWeight: FontWeight.bold,
@@ -460,7 +551,7 @@ class _BudgetState extends State<Budget> {
               ),
             ),
           ),
-          //END OF SET TODAY'S BUDGET BUTTON
+          //END OF SET BUDGET BUTTON
 
           //BUDGET FOR THE DAY CONTAINER
           Align(
@@ -502,7 +593,7 @@ class _BudgetState extends State<Budget> {
                             const Align(
                               alignment: AlignmentDirectional(-1.00, -1.00),
                               child: Text(
-                                'Budget for the day',
+                                'My Budget',
                                 style: TextStyle(
                                   fontFamily: 'Plus Jakarta Sans',
                                   color: Color(0xFF001F3F),
@@ -534,7 +625,7 @@ class _BudgetState extends State<Budget> {
                           color: const Color.fromARGB(255, 255, 255, 255),
                           height:
                               300, // Replace with an appropriate fixed height
-                          child: TodaytransactionsDashboard(),
+                          child: AllExpensesDashboard(),
                         ),
 
                         const Divider(
@@ -558,7 +649,7 @@ class _BudgetState extends State<Budget> {
                                   style: TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Color(0xFF001F3F),
-                                    fontSize: 25,
+                                    fontSize: 23,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -571,7 +662,7 @@ class _BudgetState extends State<Budget> {
                                   style: const TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Color(0xFF23CC71),
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -596,7 +687,7 @@ class _BudgetState extends State<Budget> {
                                   style: TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Color(0xFF001F3F),
-                                    fontSize: 25,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -609,7 +700,7 @@ class _BudgetState extends State<Budget> {
                                   style: const TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Color(0xFF23CC71),
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -634,33 +725,54 @@ class _BudgetState extends State<Budget> {
                                   style: TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Color(0xFF001F3F),
-                                    fontSize: 25,
+                                    fontSize: 23,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                                child: Text(
-                                  '₱$roundedRemaining',
-                                  // ₱
-                                  style: const TextStyle(
-                                    fontFamily: 'Ubuntu',
-                                    color: Color(0xFF1fb765),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '₱$roundedRemaining',
+                                      style: const TextStyle(
+                                        fontFamily: 'Ubuntu',
+                                        color: Color(0xFF1fb765),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    // Add your icon here (e.g., a currency icon)
+                                    if (expensePercentage >= 90 &&
+                                        remaining > 0) ...[
+                                      const Icon(
+                                        Icons
+                                            .warning_amber_rounded, // Warning icon
+                                        size: 20, // Set the icon size to 20
+                                        color:
+                                            Color(0xFFFF5963), // Warning color
+                                      ),
+                                      const SizedBox(
+                                        width:
+                                            4, // Spacing between icon and text
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        //RESET BUTTON HERE
+
+                        //OPERATION BUTTONs HERE
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
@@ -670,14 +782,41 @@ class _BudgetState extends State<Budget> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFF5963),
+                                    elevation: 10,
                                     padding:
                                         const EdgeInsets.fromLTRB(24, 0, 24, 0),
-                                    fixedSize: const Size(150, 50),
+                                    fixedSize: const Size(140, 50),
                                   ),
                                   child: const Text(
                                     'Reset',
                                     style: TextStyle(
-                                      fontFamily: 'Ubuntu',
+                                      fontFamily: 'Readex Pro',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    submitreset();
+                                    openReminderBox(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF23CC71),
+                                    elevation: 10,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(24, 0, 24, 0),
+                                    fixedSize: const Size(170, 50),
+                                  ),
+                                  child: const Text(
+                                    'Complete',
+                                    style: TextStyle(
+                                      fontFamily: 'Readex Pro',
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                       fontSize: 20,
                                     ),
@@ -694,6 +833,7 @@ class _BudgetState extends State<Budget> {
               ),
             ),
           )
+          //END OF OPERATION BUTTONs HERE
           //END OF BUDGET FOR THE DAY CONTAINER
         ],
       ),

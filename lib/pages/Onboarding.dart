@@ -13,7 +13,7 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
-  PageController _controller = PageController();
+  final PageController _controller = PageController();
 
   bool onLastPage = false;
 
@@ -21,24 +21,29 @@ class _OnboardingState extends State<Onboarding> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          PageView(
-            controller: _controller,
-            onPageChanged: (index) {
-              setState(() {
-                onLastPage = (index == 2);
-              });
-            },
-            children: [
-              intro_page1(),
-              intro_page2(),
-              intro_page3(),
-            ],
+          Container(
+            child: PageView(
+              controller: _controller,
+              onPageChanged: (index) {
+                setState(() {
+                  onLastPage = (index == 2);
+                });
+              },
+              children: [
+                intro_page1(),
+                intro_page2(),
+                intro_page3(),
+              ],
+            ),
           ),
 
           //NAVIGATION BAR HERE
           Container(
-            alignment: Alignment(0, 0.65),
+            alignment: Alignment.center,
+            height: 75,
+            width: 400,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -105,7 +110,7 @@ class _OnboardingState extends State<Onboarding> {
                     : GestureDetector(
                         onTap: () {
                           _controller.nextPage(
-                              duration: Duration(milliseconds: 500),
+                              duration: const Duration(milliseconds: 500),
                               curve: Curves.easeIn);
                         },
                         child: const Text(

@@ -251,7 +251,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 boxShadow: const [
                                   BoxShadow(
                                     blurRadius: 4,
-                                    color: Color(0xFF7668FD),
+                                    color: Color(0xFF23cc71),
                                     offset: Offset(0, 6),
                                     spreadRadius: 2,
                                   )
@@ -328,6 +328,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontFamily: 'Ubuntu',
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                               hintText: 'Enter your full name',
                               hintStyle: const TextStyle(
@@ -344,7 +345,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
-                                  color: Color(0xFF6F61EF),
+                                  color: Color(0xFF23cc71),
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(20),
@@ -402,6 +403,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontFamily: 'Ubuntu',
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                               hintText: 'Enter your email',
                               hintStyle: const TextStyle(
@@ -418,7 +420,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
-                                  color: Color(0xFF6F61EF),
+                                  color: Color(0xFF23cc71),
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(20),
@@ -478,6 +480,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontFamily: 'Ubuntu',
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                               alignLabelWithHint: false,
                               hintText: 'Enter your password',
@@ -495,7 +498,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
-                                  color: Color(0xFF6F61EF),
+                                  color: Color(0xFF23cc71),
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(20),
@@ -572,6 +575,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fontFamily: 'Ubuntu',
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                               alignLabelWithHint: false,
                               hintText: 'Confirm your password',
@@ -589,7 +593,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(
-                                  color: Color(0xFF6F61EF),
+                                  color: Color(0xFF23cc71),
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(20),
@@ -659,22 +663,20 @@ class _RegisterPageState extends State<RegisterPage> {
                             print('Button pressed ...');
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF6F61EF),
+                            backgroundColor: Color(0xFF23cc71),
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                            fixedSize: Size(350, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
+                            fixedSize: Size(300, 50),
                           ),
                           child: isloader
                               ? const Center(child: CircularProgressIndicator())
                               : const Text(
-                                  'Create Account',
+                                  'Sign Up',
                                   style: TextStyle(
                                     fontFamily: 'Ubuntu',
                                     color: Colors.white,
-                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
                                   ),
                                 ),
                         ),
@@ -683,7 +685,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       //DIVIDER HERE
                       const Padding(
-                        padding: EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(5.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -694,7 +696,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     indent: 20,
                                     endIndent: 5)),
                             Text(
-                              'Or Sign up With',
+                              'Or',
                               style: TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'Ubuntu',
@@ -713,69 +715,56 @@ class _RegisterPageState extends State<RegisterPage> {
                       //END OF DIVIDER
 
                       //GOOGLE AND FACEBOOK SIGN IN
-                      SizedBox(
-                        height: 50,
-                        width: double.maxFinite,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ClipOval(
-                                child: Image.network(
-                                  'https://cdn-teams-slug.flaticon.com/google.jpg', // Replace with the path to your Google logo image asset
-                                  height: 24,
-                                  width: 24,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: SizedBox(
+                          height: 50,
+                          width: 300,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ClipOval(
+                                  child: Image.network(
+                                    'https://cdn-teams-slug.flaticon.com/google.jpg', // Replace with the path to your Google logo image asset
+                                    height: 28,
+                                    width: 28,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text('Continue with Google'),
-                            ],
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text('Continue with Google'),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                                child: Divider(
-                                    color: Colors.grey,
-                                    thickness: 0.5,
-                                    indent: 20,
-                                    endIndent: 5)),
-                            Flexible(
-                                child: Divider(
-                                    color: Colors.grey,
-                                    thickness: 0.5,
-                                    indent: 5,
-                                    endIndent: 20)),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: double.maxFinite,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ClipOval(
-                                child: Image.network(
-                                  'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
-                                  height: 24,
-                                  width: 24,
+
+                      Padding(
+                        padding: const EdgeInsets.all(7.0),
+                        child: SizedBox(
+                          height: 50,
+                          width: 300,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ClipOval(
+                                  child: Image.network(
+                                    'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
+                                    height: 26,
+                                    width: 26,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text('Continue with Facebook'),
-                            ],
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text('Continue with Facebook'),
+                              ],
+                            ),
                           ),
                         ),
                       ),

@@ -159,7 +159,7 @@ class _DashboardState extends State<Dashboard> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F61EF),
+        backgroundColor: const Color(0xFF23cc71),
         automaticallyImplyLeading: false,
         title: const Text(
           'Dashboard',
@@ -271,7 +271,7 @@ class _DashboardState extends State<Dashboard> {
                                 //'₱'
                                 style: const TextStyle(
                                   fontFamily: 'Manrope',
-                                  color: Color(0xFF6F61EF),
+                                  color: Color(0xFF23cc71),
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -289,14 +289,13 @@ class _DashboardState extends State<Dashboard> {
           //END OF MY EXPENSES CONTAINER
 
           //MY SPENDING REPORT CONTAINER HERE
-          //MY SPENDING REPORT CONTAINER HERE
           Align(
             alignment: const AlignmentDirectional(0.00, 0.00),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
               child: Container(
                 width: 500,
-                height: 345,
+                height: 415,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -314,25 +313,67 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
                 child: Align(
-                  alignment: AlignmentDirectional(-1.00, -1.00),
+                  alignment: const AlignmentDirectional(-1.00, -1.00),
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                          child: Text(
-                            'Spending Report',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              color: Color(0xFF001F3F),
-                              fontSize: 30,
-                              fontWeight: FontWeight.w800,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                              child: Text(
+                                'Spending Report',
+                                style: TextStyle(
+                                  fontFamily: 'Raleway',
+                                  color: Color(0xFF001F3F),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
-                          ),
+                            // Add some spacing or divider between the title and container if needed
+                            const SizedBox(width: 10),
+                            Container(
+                              width: 245,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey[
+                                    200], // Optional: Background color for the container
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.chevron_left),
+                                    onPressed: () {
+                                      // Your left button logic
+                                    },
+                                  ),
+                                  const Text(
+                                    'Weekly Report',
+                                    style: TextStyle(
+                                      fontFamily: 'Raleway',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.chevron_right),
+                                    onPressed: () {
+                                      // Your right button logic
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         const Divider(
                           thickness: 1.5,
@@ -341,7 +382,7 @@ class _DashboardState extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: SizedBox(
-                            height: 235,
+                            height: 260,
                             child: MyBarGraph(
                               mon: mon,
                               tue: tue,
@@ -370,7 +411,7 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
               child: Container(
                 width: 500,
-                height: 420,
+                height: 360,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -419,7 +460,7 @@ class _DashboardState extends State<Dashboard> {
                         Container(
                           color: const Color.fromARGB(255, 255, 255, 255),
                           height:
-                              300, // Replace with an appropriate fixed height
+                              230, // Replace with an appropriate fixed height
                           child: TodaytransactionsDashboard(),
                         ),
                       ],
