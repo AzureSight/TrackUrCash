@@ -110,6 +110,7 @@ class _DashboardState extends State<Dashboard> {
       var data = snapshot.docs;
 
       data.forEach((expenseDoc) {
+        print("ALLLLLL");
         // Assuming 'timestamp' is a field in your Firestore document
         int expenseTimestamp = expenseDoc['timestamp'];
         double expenseAmount = expenseDoc['amount'];
@@ -125,12 +126,15 @@ class _DashboardState extends State<Dashboard> {
             break;
           case DateTime.tuesday:
             tue += expenseAmount;
+            print('Monday expense: $expenseAmount');
             break;
           case DateTime.wednesday:
             wed += expenseAmount;
+            print('Monday expense: $expenseAmount');
             break;
           case DateTime.thursday:
             thur += expenseAmount;
+            print('Monday expense: $expenseAmount');
             break;
           case DateTime.friday:
             fri += expenseAmount;
@@ -272,7 +276,7 @@ class _DashboardState extends State<Dashboard> {
                                 style: const TextStyle(
                                   fontFamily: 'Manrope',
                                   color: Color(0xFF23cc71),
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -337,42 +341,42 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                             // Add some spacing or divider between the title and container if needed
-                            const SizedBox(width: 10),
-                            Container(
-                              width: 245,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey[
-                                    200], // Optional: Background color for the container
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_left),
-                                    onPressed: () {
-                                      // Your left button logic
-                                    },
-                                  ),
-                                  const Text(
-                                    'Weekly Report',
-                                    style: TextStyle(
-                                      fontFamily: 'Raleway',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.chevron_right),
-                                    onPressed: () {
-                                      // Your right button logic
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
+                            // const SizedBox(width: 10),
+                            // Container(
+                            //   width: 245,
+                            //   padding:
+                            //       const EdgeInsets.symmetric(horizontal: 10),
+                            //   decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(8),
+                            //     color: Colors.grey[
+                            //         200], // Optional: Background color for the container
+                            //   ),
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.center,
+                            //     children: [
+                            //       // IconButton(
+                            //       //   icon: const Icon(Icons.chevron_left),
+                            //       //   onPressed: () {
+                            //       //     // Your left button logic
+                            //       //   },
+                            //       // ),
+                            //       const Text(
+                            //         'Weekly Report',
+                            //         style: TextStyle(
+                            //           fontFamily: 'Raleway',
+                            //           fontSize: 18,
+                            //           fontWeight: FontWeight.bold,
+                            //         ),
+                            //       ),
+                            //       // IconButton(
+                            //       //   icon: const Icon(Icons.chevron_right),
+                            //       //   onPressed: () {
+                            //       //     // Your right button logic
+                            //       //   },
+                            //       // ),
+                            //     ],
+                            //   ),
+                            // ),
                           ],
                         ),
                         const Divider(
@@ -382,7 +386,7 @@ class _DashboardState extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: SizedBox(
-                            height: 260,
+                            height: 280,
                             child: MyBarGraph(
                               mon: mon,
                               tue: tue,
