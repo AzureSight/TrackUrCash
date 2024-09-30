@@ -12,8 +12,9 @@ class displayrecords extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // DateTime date = DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
-    DateTime date =
-        DateTime.fromMillisecondsSinceEpoch(data['timestamp'], isUtc: true);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
+    // .add(Duration(hours: 8));
+
     String formattedDate = DateFormat('d MMM hh:mma').format(date);
     return GestureDetector(
       onTap: onSelect, // Trigger of function on tap
