@@ -40,12 +40,23 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
   Future<void> getExpensesForCurrentWeek() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    DateTime now = DateTime.now();
-    DateTime startOfThisWeek = now.subtract(Duration(days: now.weekday - 1));
-    DateTime endOfThisWeek = startOfThisWeek.add(Duration(days: 7));
+    DateTime now = DateTime.now(); // Local time
 
+    DateTime startOfThisWeek = DateTime(now.year, now.month, now.day).subtract(
+        Duration(days: now.weekday - 1)); // Move back to Monday at 12:00 AM
+    print(startOfThisWeek);
+
+    DateTime endOfThisWeek = startOfThisWeek
+        .add(Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+    print(endOfThisWeek);
+
+    // DateTime startOfThisWeekUTC = startOfThisWeek.toUtc();
+    // DateTime endOfThisWeekUTC = endOfThisWeek.toUtc();
+    // print(startOfThisWeekUTC);
+    // print(endOfThisWeekUTC);
     try {
-      print("Querying for expence");
+      print("Querying for expenses");
+
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Users')
           .doc(uid)
@@ -56,6 +67,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
               isLessThanOrEqualTo: endOfThisWeek.millisecondsSinceEpoch)
           .orderBy("timestamp", descending: false)
           .get();
+
+      // Process snapshot as usual
 
       double tempMon = 0,
           tempTue = 0,
@@ -68,13 +81,14 @@ class _MyBarGraphState extends State<MyBarGraph> {
       snapshot.docs.forEach((expenseDoc) {
         int expenseTimestamp = expenseDoc['timestamp'];
         double expenseAmount = (expenseDoc['amount'] as num).toDouble();
+
         DateTime expenseDate =
             DateTime.fromMillisecondsSinceEpoch(expenseTimestamp);
 
         switch (expenseDate.weekday) {
           case DateTime.monday:
             tempMon += expenseAmount;
-            print("temp: $tempMon");
+            print("tempMon: $tempMon");
             break;
           case DateTime.tuesday:
             tempTue += expenseAmount;
@@ -93,12 +107,13 @@ class _MyBarGraphState extends State<MyBarGraph> {
             break;
           case DateTime.sunday:
             tempSun += expenseAmount;
-            print("temp: $tempSun");
+            print("tempSun: $tempSun");
             break;
           default:
             break;
         }
       });
+
       // Update the bar graph with the new values
       updateBarGraph(
           tempMon, tempTue, tempWed, tempThur, tempFri, tempSat, tempSun);
@@ -229,7 +244,6 @@ Widget getBottomTitles(double value, TitleMeta meta) {
     child: text,
   );
 }
-
 
 // double mons = 0.0;
 // double tues = 0.0;
