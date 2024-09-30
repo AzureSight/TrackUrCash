@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Dashboard.dart';
 import 'package:finalproject_cst9l/pages/Budget.dart';
 import 'package:finalproject_cst9l/pages/displayrecords.dart';
@@ -390,7 +391,13 @@ class _ExpensesState extends State<Expenses> {
         elevation: 2,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: openNoteBox,
+        onPressed:
+            //  openNoteBox,
+            () {
+          NotificationService().showNotification(
+              title: 'Budget Alert', body: 'BUDGET NOTIF TESTING!');
+          print("pressed");
+        },
         backgroundColor: Color(0xFF23CC71),
         child: const Icon(
           Icons.add,
