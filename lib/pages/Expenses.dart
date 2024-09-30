@@ -60,6 +60,8 @@ class _ExpensesState extends State<Expenses> {
         .collection("expenses")
         .doc(id)
         .set(data);
+
+    NotificationService().checkBudget();
   }
 
   Future<double> computeTotalAmount() async {
@@ -393,11 +395,6 @@ class _ExpensesState extends State<Expenses> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
-        //     () {
-        //   NotificationService().showNotification(
-        //       title: 'Budget Alert', body: 'BUDGET NOTIF TESTING!');
-        //   print("pressed");
-        // },
         backgroundColor: Color(0xFF23CC71),
         child: const Icon(Icons.add),
       ),

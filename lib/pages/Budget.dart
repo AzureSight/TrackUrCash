@@ -1,10 +1,7 @@
 // ignore: file_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Refreshamount.dart';
-import 'package:finalproject_cst9l/pages/Dashboard.dart';
-import 'package:finalproject_cst9l/pages/Expenses.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -271,11 +268,11 @@ class _BudgetState extends State<Budget> {
 
   Future<void> submit() async {
     final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
     // ignore: non_constant_identifier_names
-    var Amount = double.parse(_budgetController.text);
-    DateTime date = DateTime.now();
+    // var Amount = double.parse(_budgetController.text);
+    // DateTime date = DateTime.now();
 
     if (User != null) {
       try {
@@ -295,7 +292,7 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             var amount = double.parse(_budgetController.text);
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
@@ -326,11 +323,11 @@ class _BudgetState extends State<Budget> {
 
   Future<void> submitreset() async {
     final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
     // ignore: non_constant_identifier_names
 
-    DateTime date = DateTime.now();
+    // DateTime date = DateTime.now();
 
     if (User != null) {
       try {
@@ -350,7 +347,7 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             double resetbudget = 0;
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
@@ -384,13 +381,17 @@ class _BudgetState extends State<Budget> {
     super.initState();
     initializeTotal();
     getbudget();
+    NotificationService().checkBudget();
   }
+
+  double roundedRemaining = 0.0;
+  double remaining = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    double remaining = budget - tot;
-    double roundedRemaining = double.parse(remaining.toStringAsFixed(2));
-    print(roundedRemaining);
+    remaining = budget - tot;
+    roundedRemaining = double.parse(remaining.toStringAsFixed(2));
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF6F61EF),
