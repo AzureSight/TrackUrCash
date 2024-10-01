@@ -197,6 +197,7 @@ class _BudgetState extends State<Budget> {
                         if (_keyform.currentState!.validate()) {
                           // Add your Elevated Button functionality here
                           submit();
+                          NotificationService().checkBudget();
                           Navigator.pop(context);
                         }
                         //
@@ -387,9 +388,10 @@ class _BudgetState extends State<Budget> {
     NotificationService().checkBudget();
   }
 
+  double remaining = 0.0;
+
   @override
   Widget build(BuildContext context) {
-    double remaining;
     if (budget == 0) {
       remaining = 0;
     } else {
@@ -428,9 +430,6 @@ class _BudgetState extends State<Budget> {
       message = getRandomMessage(exceedBudgetMessages, remaining);
     }
     void openReminderBox(BuildContext context) {
-      String reminderMessage =
-          "Reminder: Keep an eye on your expenses every day to stay within your budget!";
-
       showDialog(
         context: context,
         builder: (context) {
