@@ -308,7 +308,7 @@ class _DashboardState extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: SizedBox(
-                            height: 305,
+                            height: 303,
                             child: MyBarGraph(),
                           ),
                         ),

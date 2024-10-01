@@ -73,7 +73,7 @@ class _BudgetState extends State<Budget> {
                         _budgetdetailController.clear();
                       },
                       icon: const Icon(Icons.clear)),
-                  labelText: 'Budget Details',
+                  labelText: 'Budget Description',
                   labelStyle: const TextStyle(
                     fontFamily: 'Ubuntu',
                     fontSize: 16,

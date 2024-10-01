@@ -63,7 +63,7 @@ class displayrecords extends StatelessWidget {
                       style: TextStyle(color: Colors.grey),
                     ),
                     const Spacer(),
-                    Text("~Budget Description~",
+                    Text("Budget Description",
                         style: TextStyle(color: Colors.black87, fontSize: 12)),
                   ],
                 )
