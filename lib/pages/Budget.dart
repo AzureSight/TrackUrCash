@@ -9,6 +9,7 @@ import 'package:finalproject_cst9l/pages/Refreshamount.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
 
 //import 'package:percent_indicator/linear_percent_indicator.dart';
 class Budget extends StatefulWidget {
@@ -23,6 +24,7 @@ class _BudgetState extends State<Budget> {
 //  int _currentPage = 2;
   final TextEditingController _budgetController = TextEditingController();
   double budget = 0.0;
+  var uid = Uuid();
   //DIALOG BOX TO ADD EXPENSES HERE
 
   // void refreshPage() {
@@ -280,41 +282,41 @@ class _BudgetState extends State<Budget> {
 
     if (user != null) {
       try {
-        // Retrieve all documents from the 'Users' collection
-        DocumentSnapshot userDocument = await FirebaseFirestore.instance
-            .collection("Users")
+        var amount = double.parse(_budgetController.text);
+        var id = uid.v4();
+
+        QuerySnapshot existingBudgets = await FirebaseFirestore.instance
+            .collection('Users')
             .doc(user.uid)
+            .collection('budget')
             .get();
 
-        // Iterate through each document in the collection
-        if (userDocument.exists) {
-          Map<String, dynamic> userData =
-              userDocument.data() as Map<String, dynamic>;
-          // Retrieve 'name' field from the document
-          String? userName = userData['name'];
+        WriteBatch batch = FirebaseFirestore.instance.batch();
 
-          // Here, you might want to match the user ID with the current user's ID
-          if (userName != null) {
-            var amount = double.parse(_budgetController.text);
-            // DateTime date = DateTime.now();
-
-            var data = {
-              "email":
-                  user.email ?? "", // Using email from Firebase Authentication
-              "name": userName, // Using the 'name' field from Firestore
-              "budget": amount,
-              // Other fields you want to add to Firestore
-            };
-
-            // Update Firestore document
-            await FirebaseFirestore.instance
-                .collection("Users")
-                .doc(user.uid)
-                .set(data);
-
-            _budgetController.clear();
-          }
+        for (var doc in existingBudgets.docs) {
+          batch.update(doc.reference, {'status': 'completed'});
         }
+
+        await batch.commit();
+
+        var data = {
+          "id": id,
+          "budget_amount": amount,
+          "budget_desc": "last",
+          "status": "active",
+          "created_at": FieldValue.serverTimestamp(),
+        };
+
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(user.uid)
+            .collection("budget")
+            .doc(id)
+            .set(data);
+
+        _budgetController.clear();
+
+        print("New budget added and existing budgets updated to 'completed'.");
       } catch (e) {
         print("Error retrieving data: $e");
       }
