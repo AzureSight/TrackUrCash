@@ -6,10 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/AllExpenses.dart';
 import 'package:finalproject_cst9l/pages/Refreshamount.dart';
-import 'package:finalproject_cst9l/pages/Dashboard.dart';
-import 'package:finalproject_cst9l/pages/Expenses.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
-import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -239,14 +235,14 @@ class _BudgetState extends State<Budget> {
   }
 
   Future<void> getbudget() async {
-    final User = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
-    if (User != null) {
+    if (user != null) {
       try {
-        // Retrieve all documents from the 'Users' collection
+        // Retrieve all documents from the 'users' collection
         DocumentSnapshot userDocument = await FirebaseFirestore.instance
             .collection("Users")
-            .doc(User.uid)
+            .doc(user.uid)
             .get();
 
         // Iterate through each document in the collection
@@ -274,19 +270,19 @@ class _BudgetState extends State<Budget> {
   }
 
   Future<void> submit() async {
-    final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    final user = FirebaseAuth.instance.currentUser;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    // ignore: non_constant_identifier_names
-    var Amount = double.parse(_budgetController.text);
-    DateTime date = DateTime.now();
+    // // ignore: non_constant_identifier_names
+    // var Amount = double.parse(_budgetController.text);
+    // DateTime date = DateTime.now();
 
-    if (User != null) {
+    if (user != null) {
       try {
         // Retrieve all documents from the 'Users' collection
         DocumentSnapshot userDocument = await FirebaseFirestore.instance
             .collection("Users")
-            .doc(User.uid)
+            .doc(user.uid)
             .get();
 
         // Iterate through each document in the collection
@@ -299,11 +295,11 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             var amount = double.parse(_budgetController.text);
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
-                  User.email ?? "", // Using email from Firebase Authentication
+                  user.email ?? "", // Using email from Firebase Authentication
               "name": userName, // Using the 'name' field from Firestore
               "budget": amount,
               // Other fields you want to add to Firestore
@@ -312,7 +308,7 @@ class _BudgetState extends State<Budget> {
             // Update Firestore document
             await FirebaseFirestore.instance
                 .collection("Users")
-                .doc(User.uid)
+                .doc(user.uid)
                 .set(data);
 
             _budgetController.clear();
@@ -329,19 +325,19 @@ class _BudgetState extends State<Budget> {
   }
 
   Future<void> submitreset() async {
-    final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    final user = FirebaseAuth.instance.currentUser;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    // ignore: non_constant_identifier_names
+    // // ignore: non_constant_identifier_names
 
-    DateTime date = DateTime.now();
+    // DateTime date = DateTime.now();
 
-    if (User != null) {
+    if (user != null) {
       try {
         // Retrieve all documents from the 'Users' collection
         DocumentSnapshot userDocument = await FirebaseFirestore.instance
             .collection("Users")
-            .doc(User.uid)
+            .doc(user.uid)
             .get();
 
         // Iterate through each document in the collection
@@ -354,11 +350,11 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             double resetbudget = 0;
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
-                  User.email ?? "", // Using email from Firebase Authentication
+                  user.email ?? "", // Using email from Firebase Authentication
               "name": userName, // Using the 'name' field from Firestore
               "budget": resetbudget,
               // Other fields you want to add to Firestore
@@ -367,7 +363,7 @@ class _BudgetState extends State<Budget> {
             // Update Firestore document
             await FirebaseFirestore.instance
                 .collection("Users")
-                .doc(User.uid)
+                .doc(user.uid)
                 .set(data);
             getbudget();
             _budgetController.clear();
