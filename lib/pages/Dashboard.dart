@@ -306,9 +306,9 @@ class _DashboardState extends State<Dashboard> {
                           color: Color(0xFFBDC3C7),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(20.0),
                           child: SizedBox(
-                            height: 235,
+                            height: 290,
                             child: MyBarGraph(),
                           ),
                         ),
