@@ -403,15 +403,15 @@ class _BudgetState extends State<Budget> {
     double expensePercentage = (tot / budget) * 100;
     // Lists of messages
     List<String> withinBudgetMessages = [
-      "Great job! You've stayed within your budget and saved {savings} pesos. Consider putting this towards your savings or future expenses!",
-      "Awesome work! Not only did you manage your expenses well, but you also saved {savings} pesos. Keep it up and watch those small savings add up!",
-      "You're doing fantastic! By sticking to your budget, you've managed to save {savings} pesos. Treat yourself or save it for something bigger!"
+      "Great job! You've stayed within your budget and saved {savings} pesos.",
+      "Awesome work! You also saved {savings} pesos. Keep it up!",
+      "You're doing fantastic! You've managed to save {savings} pesos. Save it for something bigger!"
     ];
 
     List<String> exceedBudgetMessages = [
-      "Uh-oh! Your expenses have exceeded your budget. Consider reviewing your spending to identify areas for adjustment.",
-      "Looks like you're over your budget. Take a moment to review your expenses and see where you can cut back.",
-      "Your current expenses are over your budget limit. Don’t worry! It’s a great opportunity to reassess your spending habits and find ways to save."
+      "Uh-oh! Your expenses have exceeded your budget.",
+      "Looks like you're over your budget.",
+      "Your current expenses are over your budget limit. Don’t worry!"
     ];
 
     // Function to get a random message
