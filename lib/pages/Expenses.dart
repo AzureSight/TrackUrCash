@@ -47,12 +47,22 @@ class _ExpensesState extends State<Expenses> {
     print(_expensedetailController.text.toString());
     await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
 
+    QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(User.uid)
+        .collection('budget')
+        .where('status', isEqualTo: 'active')
+        .limit(1) // We expect only one active budget at a time
+        .get();
+    var activeBudgetDoc = activeBudgetQuery.docs.first;
+    var activeBudgetDescription = activeBudgetDoc['budget_desc'];
     var data = {
       "id": id,
       "detail": detail,
       "amount": Amount,
       "timestamp": timestamp,
       "monthyear": monthyear,
+      "budget": activeBudgetDescription,
     };
     await FirebaseFirestore.instance
         .collection("Users")
