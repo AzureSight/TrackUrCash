@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Dashboard.dart';
-import 'package:finalproject_cst9l/pages/Budget.dart';
 import 'package:finalproject_cst9l/pages/displayrecords.dart';
 import 'package:finalproject_cst9l/pages/update.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/services/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -54,8 +52,16 @@ class _ExpensesState extends State<Expenses> {
         .where('status', isEqualTo: 'active')
         .limit(1) // We expect only one active budget at a time
         .get();
-    var activeBudgetDoc = activeBudgetQuery.docs.first;
-    var activeBudgetDescription = activeBudgetDoc['budget_desc'];
+
+    String activeBudgetDescription;
+
+    if (activeBudgetQuery.docs.isNotEmpty) {
+      var activeBudgetDoc = activeBudgetQuery.docs.first;
+      activeBudgetDescription = activeBudgetDoc['budget_desc'];
+    } else {
+      // If no active budget is found, set to "Uncategorized"
+      activeBudgetDescription = "Uncategorized";
+    }
     var data = {
       "id": id,
       "detail": detail,
@@ -97,8 +103,6 @@ class _ExpensesState extends State<Expenses> {
 
   Future<double> getTotalAmount() async {
     double total = await computeTotalAmount();
-    print('Total amount: $total');
-
     return total;
     // Use the 'total' variable wherever you need it in your code
   }

@@ -1,8 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finalproject_cst9l/pages/Budget.dart';
-
-import 'package:finalproject_cst9l/pages/Expenses.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:finalproject_cst9l/pages/Fetchbargraphdata.dart';
 
@@ -55,7 +51,7 @@ Future<double> Caltotal() async {
 double total = 0.0;
 Future<double> gettotal() async {
   total = await Caltotal();
-  print('Total amount: $total');
+  // print('Total amount: $total');
 
   return total;
   // Use the 'total' variable wherever you need it in your code

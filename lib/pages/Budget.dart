@@ -4,8 +4,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject_cst9l/notif/notif.dart';
-import 'package:finalproject_cst9l/pages/AllExpenses.dart';
-import 'package:finalproject_cst9l/pages/Refreshamount.dart';
+import 'package:finalproject_cst9l/pages/Transactions_budget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +24,8 @@ class _BudgetState extends State<Budget> {
   final TextEditingController _budgetController = TextEditingController();
   final TextEditingController _budgetdetailController = TextEditingController();
   double budget = 0.0;
+  String budgetdesc = "";
+  double tot = 0.0;
   var uid = Uuid();
   //DIALOG BOX TO ADD EXPENSES HERE
 
@@ -314,22 +315,36 @@ class _BudgetState extends State<Budget> {
     if (user != null) {
       try {
         // Retrieve all documents from the 'users' collection
-        DocumentSnapshot userDocument = await FirebaseFirestore.instance
+        QuerySnapshot userDocument = await FirebaseFirestore.instance
             .collection("Users")
             .doc(user.uid)
+            .collection("budget")
+            .where("status", isEqualTo: "active")
             .get();
 
-        // Iterate through each document in the collection
-        if (userDocument.exists) {
+        if (userDocument.docs.isNotEmpty) {
+          var activeBudget = userDocument.docs.first;
+          print("Active Budget Data: ${activeBudget.data()}");
           Map<String, dynamic> userData =
-              userDocument.data() as Map<String, dynamic>;
-          // Retrieve 'name' field from the document
-          //  String? userName = userData['name'];
-          double newBudget = userData['budget'];
+              activeBudget.data() as Map<String, dynamic>;
+
+          // Check if the value is stored as an int, and convert it to double if necessary
+          double newBudget = userData['budget_amount'] is int
+              ? (userData['budget_amount'] as int)
+                  .toDouble() // Convert int to double
+              : userData['budget_amount']
+                  as double; // If it's already a double, no need to convert
+
+          String newbudgetdesc = userData['budget_desc'];
           setState(() {
-            budget = newBudget; // Update the 'budget' variable
+            budget = newBudget;
+            budgetdesc = newbudgetdesc;
           });
-          // Here, you might want to match the user ID with the current user's ID
+        } else {
+          setState(() {
+            budget = 0.0;
+            budgetdesc = "";
+          });
         }
       } catch (e) {
         print("Error retrieving data: $e");
@@ -337,10 +352,66 @@ class _BudgetState extends State<Budget> {
     }
   }
 
-  var reff = Refresh();
-  Future<void> initializeTotal() async {
-    double total = await reff.taketotal();
-    tot = total;
+  // var budamount = BudgetGetter();
+  // Future<void> initializeTotal() async {
+  //   print("budget description: $budgetdesc");
+  //   double total = await budamount.fetchbudget();
+  //   tot = total;
+  //   print("expense AMOUNT IN BUDGET: $tot");
+  // }
+
+  Future<void> fetchexpenses() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).get();
+
+    QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection('budget')
+        .where('status', isEqualTo: 'active')
+        .limit(1) // We expect only one active budget at a time
+        .get();
+
+    String activeBudgetDescription = " ";
+
+    if (activeBudgetQuery.docs.isNotEmpty) {
+      var activeBudgetDoc = activeBudgetQuery.docs.first;
+      activeBudgetDescription = activeBudgetDoc['budget_desc'];
+    }
+
+    DateTime now = DateTime.now();
+    DateTime startOfToday =
+        DateTime(now.year, now.month, now.day); // Start of current day
+    DateTime endOfToday = DateTime(
+        now.year, now.month, now.day, 23, 59, 59); // End of current day
+    double totalAmount = 0;
+    if (activeBudgetQuery.docs.isNotEmpty) {
+      QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.uid)
+          .collection('expenses')
+          .where('timestamp',
+              isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+          .where('timestamp',
+              isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+          .where('budget', isEqualTo: activeBudgetDescription)
+          .get();
+
+      List<QueryDocumentSnapshot> expenses = expenseSnapshot.docs;
+
+      for (var expense in expenses) {
+        totalAmount += (expense['amount'] as num).toDouble();
+      }
+
+      setState(() {
+        tot = totalAmount.toDouble();
+      });
+    } else {
+      setState(() {
+        tot = 0.0;
+      });
+    }
   }
 
   Future<void> submit() async {
@@ -354,6 +425,7 @@ class _BudgetState extends State<Budget> {
     if (user != null) {
       try {
         var amount = double.parse(_budgetController.text);
+        var desc = _budgetdetailController.text;
         var id = uid.v4();
 
         QuerySnapshot existingBudgets = await FirebaseFirestore.instance
@@ -373,7 +445,7 @@ class _BudgetState extends State<Budget> {
         var data = {
           "id": id,
           "budget_amount": amount,
-          "budget_desc": "last",
+          "budget_desc": desc,
           "status": "active",
           "created_at": FieldValue.serverTimestamp(),
         };
@@ -386,6 +458,7 @@ class _BudgetState extends State<Budget> {
             .set(data);
 
         _budgetController.clear();
+        _budgetdetailController.clear();
 
         print("New budget added and existing budgets updated to 'completed'.");
       } catch (e) {
@@ -394,7 +467,7 @@ class _BudgetState extends State<Budget> {
     } else {
       print("User not logged in");
     }
-    initializeTotal();
+    fetchexpenses();
     getbudget();
   }
 
@@ -451,20 +524,57 @@ class _BudgetState extends State<Budget> {
     }
   }
 
-  double tot = 0;
+  Future<void> completed() async {
+    final user = FirebaseAuth.instance.currentUser;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    // // ignore: non_constant_identifier_names
+
+    // DateTime date = DateTime.now();
+
+    if (user != null) {
+      try {
+        QuerySnapshot existingBudgets = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .collection('budget')
+            .get();
+
+        WriteBatch batch = FirebaseFirestore.instance.batch();
+
+        for (var doc in existingBudgets.docs) {
+          batch.update(doc.reference, {'status': 'completed'});
+        }
+
+        await batch.commit();
+
+        getbudget();
+        _budgetController.clear();
+      } catch (e) {
+        print("Error retrieving data: $e");
+      }
+    } else {
+      print("User not logged in");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    initializeTotal();
-    getbudget();
+    initialize();
     NotificationService().checkBudget();
+  }
+
+  Future<void> initialize() async {
+    await getbudget();
+    await fetchexpenses();
   }
 
   double remaining = 0.0;
 
   @override
   Widget build(BuildContext context) {
+    print("Expenses$tot");
     if (budget == 0) {
       remaining = 0;
     } else {
@@ -518,7 +628,7 @@ class _BudgetState extends State<Budget> {
             ),
             content: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Ubuntu',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -528,6 +638,10 @@ class _BudgetState extends State<Budget> {
             actions: [
               TextButton(
                 onPressed: () {
+                  completed();
+                  getbudget();
+                  fetchexpenses();
+                  NotificationService().checkBudget();
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
@@ -536,7 +650,7 @@ class _BudgetState extends State<Budget> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 24, vertical: 12), // Add padding if needed
                 ),
-                child: Text(
+                child: const Text(
                   "Got it!",
                   style: TextStyle(
                     fontFamily: 'Ubuntu', // Use Ubuntu font
@@ -550,7 +664,6 @@ class _BudgetState extends State<Budget> {
       );
     }
 
-    print(roundedRemaining);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF23cc71),
@@ -687,12 +800,13 @@ class _BudgetState extends State<Budget> {
                               ],
                             ),
                             Align(
-                              alignment: AlignmentDirectional(-1.00, -1.00),
+                              alignment:
+                                  const AlignmentDirectional(-1.00, -1.00),
                               child: Padding(
-                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                                 child: Text(
-                                  '~Budget Description~',
-                                  style: TextStyle(
+                                  budgetdesc,
+                                  style: const TextStyle(
                                     fontFamily: 'Manrope',
                                     color: Color(0xFF2E2863),
                                     fontSize: 16,
@@ -715,7 +829,9 @@ class _BudgetState extends State<Budget> {
                           color: const Color.fromARGB(255, 255, 255, 255),
                           height:
                               300, // Replace with an appropriate fixed height
-                          child: AllExpensesDashboard(),
+                          child: Transactions_Budget(
+                            data: budgetdesc,
+                          ),
                         ),
 
                         const Divider(
@@ -745,7 +861,7 @@ class _BudgetState extends State<Budget> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
+                                padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
                                 child: Text(
                                   '₱$budget',
                                   // ₱
@@ -892,7 +1008,6 @@ class _BudgetState extends State<Budget> {
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    submitreset();
                                     openReminderBox(context);
                                   },
                                   style: ElevatedButton.styleFrom(

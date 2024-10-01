@@ -1,17 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finalproject_cst9l/pages/Dashboard.dart';
-import 'package:finalproject_cst9l/pages/Budget.dart';
-import 'package:finalproject_cst9l/pages/displayrecords.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/services/firestore.dart';
 import 'package:flutter/material.dart';
 
 class Update {
-  int _currentPage = 0;
+  // int _currentPage = 0;
   final GlobalKey<FormState> _keyform = GlobalKey<FormState>();
   final FirestoreService firestoreService = FirestoreService();
   TextEditingController _expensedetailController = TextEditingController();
@@ -22,13 +18,13 @@ class Update {
   Future<void> submit(expensedata) async {
     // _expensedetailController.text = expensedata['detail'];
     final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
     String detail = _expensedetailController.text.toString();
     // ignore: non_constant_identifier_names
     var Amount = double.parse(_amountController.text);
-    DateTime date = DateTime.now();
-    var id = uid.v4();
-    String monthyear = DateFormat("MMM y").format(date);
+    // DateTime date = DateTime.now();
+    // var id = uid.v4();
+    // String monthyear = DateFormat("MMM y").format(date);
     print(_expensedetailController.text.toString());
 
     await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
@@ -71,8 +67,6 @@ class Update {
 
   Future<double> getTotalAmount() async {
     double total = await computeTotalAmount();
-    print('Total amount: $total');
-
     return total;
     // Use the 'total' variable wherever you need it in your code
   }

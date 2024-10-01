@@ -96,10 +96,8 @@ class NotificationService {
     double total = await reff.taketotal();
     double budget = await getbudget();
     double remaining = budget - total;
-    print(remaining);
 
     if (remaining < budget * 0.5) {
-      // Show notification
       await showNotification(
           title: 'Budget Alert', body: 'BUDGET NOTIF TESTING!');
       print("NOTIFIED");

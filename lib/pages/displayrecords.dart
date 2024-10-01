@@ -38,7 +38,7 @@ class displayrecords extends StatelessWidget {
                 Expanded(
                   child: Text(
                     "${data['detail']}",
-                    style: TextStyle(color: Colors.green),
+                    style: const TextStyle(color: Colors.green),
                   ),
                 )
               ],
@@ -53,18 +53,20 @@ class displayrecords extends StatelessWidget {
                         style: TextStyle(color: Colors.grey, fontSize: 13)),
                     const Spacer(),
                     Text("₱${data['amount']}",
-                        style: TextStyle(color: Colors.grey, fontSize: 13))
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13))
                   ],
                 ),
                 Row(
                   children: [
                     Text(
                       formattedDate,
-                      style: TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: Colors.grey),
                     ),
                     const Spacer(),
-                    Text("Budget Description",
-                        style: TextStyle(color: Colors.black54, fontSize: 13))
+                    Text("${data['budget']}",
+                        style: const TextStyle(
+                            color: Colors.black54, fontSize: 13))
                   ],
                 )
               ],
