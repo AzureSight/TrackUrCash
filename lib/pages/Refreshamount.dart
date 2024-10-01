@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Refresh {
-  Future<double> Caltotal() async {
+  Future<double> caltotal() async {
     final User? user = FirebaseAuth.instance.currentUser;
     DateTime now = DateTime.now();
     DateTime startOfToday =
@@ -33,10 +33,7 @@ class Refresh {
 
   double total = 0.0;
   Future<double> taketotal() async {
-    total = await Caltotal();
-
-    print('Total amount: $total');
-
+    total = await caltotal();
     return total;
     // Use the 'total' variable wherever you need it in your code
   }

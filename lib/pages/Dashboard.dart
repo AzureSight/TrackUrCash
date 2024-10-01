@@ -5,7 +5,6 @@ import 'package:finalproject_cst9l/pages/Expenses.dart';
 import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:finalproject_cst9l/pages/Fetchbargraphdata.dart';
-import 'package:finalproject_cst9l/pages/bargraphquery.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -70,8 +69,6 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     initializeTotal();
-    bargraphquery query = bargraphquery();
-    query.getExpensesForCurrentWeeks();
   }
 
   Future<void> initializeTotal() async {
@@ -81,85 +78,10 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  ///////////query for bargraph
-  double mon = 0.0;
-  double tue = 0.0;
-  double wed = 0.0;
-  double thur = 0.0;
-  double fri = 0.0;
-  double sat = 0.0;
-  double sun = 0.0;
-  void getExpensesForCurrentWeek() {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    DateTime now = DateTime.now();
-    DateTime startOfThisWeek = now.subtract(Duration(
-        days: now.weekday - 1)); // Assuming Monday is the start of the week
-    DateTime endOfThisWeek = startOfThisWeek.add(Duration(days: 6));
-
-    FirebaseFirestore.instance
-        .collection('Users')
-        .doc(uid)
-        .collection('expenses')
-        .where('timestamp',
-            isGreaterThanOrEqualTo: startOfThisWeek.millisecondsSinceEpoch)
-        .where('timestamp',
-            isLessThanOrEqualTo: endOfThisWeek.millisecondsSinceEpoch)
-        .orderBy("timestamp", descending: false)
-        .snapshots()
-        .listen((QuerySnapshot snapshot) {
-      var data = snapshot.docs;
-
-      data.forEach((expenseDoc) {
-        print("ALLLLLL");
-        // Assuming 'timestamp' is a field in your Firestore document
-        int expenseTimestamp = expenseDoc['timestamp'];
-        double expenseAmount = expenseDoc['amount'];
-
-        DateTime expenseDate =
-            DateTime.fromMillisecondsSinceEpoch(expenseTimestamp);
-
-        // Check the day of the week and add the expense amount to the respective day
-        switch (expenseDate.weekday) {
-          case DateTime.monday:
-            mon += expenseAmount;
-            print('Monday expense: $expenseAmount');
-            break;
-          case DateTime.tuesday:
-            tue += expenseAmount;
-            print('Monday expense: $expenseAmount');
-            break;
-          case DateTime.wednesday:
-            wed += expenseAmount;
-            print('Monday expense: $expenseAmount');
-            break;
-          case DateTime.thursday:
-            thur += expenseAmount;
-            print('Monday expense: $expenseAmount');
-            break;
-          case DateTime.friday:
-            fri += expenseAmount;
-            break;
-          case DateTime.saturday:
-            sat += expenseAmount;
-            break;
-          case DateTime.sunday:
-            sun += expenseAmount;
-            break;
-          default:
-            break;
-        }
-      });
-    });
-    print(mon);
-    print(tue);
-    print(wed);
-  }
-
 //  String total = getTotalAmountFromTodayTransactions();
   @override
   Widget build(BuildContext context) {
     //Caltotal();
-    getExpensesForCurrentWeek();
 
     return Scaffold(
       appBar: AppBar(
@@ -386,16 +308,8 @@ class _DashboardState extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: SizedBox(
-                            height: 280,
-                            child: MyBarGraph(
-                              mon: mon,
-                              tue: tue,
-                              wed: wed,
-                              thur: thur,
-                              fri: fri,
-                              sat: sat,
-                              sun: sun,
-                            ),
+                            height: 235,
+                            child: MyBarGraph(),
                           ),
                         ),
                       ],

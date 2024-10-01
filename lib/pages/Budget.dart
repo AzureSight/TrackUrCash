@@ -1,13 +1,7 @@
 // ignore: file_names
-
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finalproject_cst9l/pages/AllExpenses.dart';
+import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Refreshamount.dart';
-import 'package:finalproject_cst9l/pages/Dashboard.dart';
-import 'package:finalproject_cst9l/pages/Expenses.dart';
-import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -274,11 +268,11 @@ class _BudgetState extends State<Budget> {
 
   Future<void> submit() async {
     final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
     // ignore: non_constant_identifier_names
-    var Amount = double.parse(_budgetController.text);
-    DateTime date = DateTime.now();
+    // var Amount = double.parse(_budgetController.text);
+    // DateTime date = DateTime.now();
 
     if (User != null) {
       try {
@@ -298,7 +292,7 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             var amount = double.parse(_budgetController.text);
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
@@ -329,11 +323,11 @@ class _BudgetState extends State<Budget> {
 
   Future<void> submitreset() async {
     final User = FirebaseAuth.instance.currentUser;
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // int timestamp = DateTime.now().millisecondsSinceEpoch;
 
     // ignore: non_constant_identifier_names
 
-    DateTime date = DateTime.now();
+    // DateTime date = DateTime.now();
 
     if (User != null) {
       try {
@@ -353,7 +347,7 @@ class _BudgetState extends State<Budget> {
           // Here, you might want to match the user ID with the current user's ID
           if (userName != null) {
             double resetbudget = 0;
-            DateTime date = DateTime.now();
+            // DateTime date = DateTime.now();
 
             var data = {
               "email":
@@ -387,100 +381,17 @@ class _BudgetState extends State<Budget> {
     super.initState();
     initializeTotal();
     getbudget();
+    NotificationService().checkBudget();
   }
+
+  double roundedRemaining = 0.0;
+  double remaining = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    double remaining;
-    if (budget == 0) {
-      remaining = 0;
-    } else {
-      remaining = budget - tot;
-    }
+    remaining = budget - tot;
+    roundedRemaining = double.parse(remaining.toStringAsFixed(2));
 
-    double roundedRemaining = double.parse(remaining.toStringAsFixed(2));
-    double savings = remaining;
-    double expensePercentage = (tot / budget) * 100;
-    // Lists of messages
-    List<String> withinBudgetMessages = [
-      "Great job! You've stayed within your budget and saved {savings} pesos.",
-      "Awesome work! You also saved {savings} pesos. Keep it up!",
-      "You're doing fantastic! You've managed to save {savings} pesos. Save it for something bigger!"
-    ];
-
-    List<String> exceedBudgetMessages = [
-      "Uh-oh! Your expenses have exceeded your budget.",
-      "Looks like you're over your budget.",
-      "Your current expenses are over your budget limit. Don’t worry!"
-    ];
-
-    // Function to get a random message
-    String getRandomMessage(List<String> messages, savings) {
-      final random = Random();
-      String message = messages[random.nextInt(messages.length)];
-      // Replace "{savings}" in the message with the actual savings value
-      return message.replaceAll("{savings}", savings.toStringAsFixed(2));
-    }
-
-    // Determine which list of messages to use
-    String message;
-    if (roundedRemaining >= 0) {
-      message = getRandomMessage(withinBudgetMessages, remaining);
-    } else {
-      message = getRandomMessage(exceedBudgetMessages, remaining);
-    }
-    void openReminderBox(BuildContext context) {
-      String reminderMessage =
-          "Reminder: Keep an eye on your expenses every day to stay within your budget!";
-
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text(
-              "Reminder!",
-              style: TextStyle(
-                fontFamily: 'Ubuntu',
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF001F3F),
-              ),
-            ),
-            content: Text(
-              message,
-              style: TextStyle(
-                fontFamily: 'Ubuntu',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF23CC71), // Green background
-                  foregroundColor: Colors.white, // White text
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 12), // Add padding if needed
-                ),
-                child: Text(
-                  "Got it!",
-                  style: TextStyle(
-                    fontFamily: 'Ubuntu', // Use Ubuntu font
-                    fontSize: 16, // Adjust font size as needed
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    print(roundedRemaining);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF23cc71),

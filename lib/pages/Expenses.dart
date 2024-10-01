@@ -31,7 +31,13 @@ class _ExpensesState extends State<Expenses> {
 
   Future<void> submit() async {
     final User = FirebaseAuth.instance.currentUser;
+
+    // DateTime now = DateTime.now().toUtc().add(Duration(hours: 8));
+    // // Use the adjusted DateTime to get the milliseconds since epoch
+    // int timestamp = now.millisecondsSinceEpoch;
+
     int timestamp = DateTime.now().millisecondsSinceEpoch;
+    print(timestamp);
     String detail = _expensedetailController.text.toString();
     // ignore: non_constant_identifier_names
     var Amount = double.parse(_amountController.text);
@@ -54,6 +60,8 @@ class _ExpensesState extends State<Expenses> {
         .collection("expenses")
         .doc(id)
         .set(data);
+
+    NotificationService().checkBudget();
   }
 
   Future<double> computeTotalAmount() async {
@@ -392,11 +400,6 @@ class _ExpensesState extends State<Expenses> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
-        //     () {
-        //   NotificationService().showNotification(
-        //       title: 'Budget Alert', body: 'BUDGET NOTIF TESTING!');
-        //   print("pressed");
-        // },
         backgroundColor: Color(0xFF23CC71),
         child: const Icon(
           Icons.add,
