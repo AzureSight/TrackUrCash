@@ -135,7 +135,9 @@ class _MyBarGraphState extends State<MyBarGraph> {
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
-                    showTitles: true, getTitlesWidget: getBottomTitles),
+                  showTitles: true,
+                  getTitlesWidget: getBottomTitles,
+                ),
               ),
             ),
             barGroups: [

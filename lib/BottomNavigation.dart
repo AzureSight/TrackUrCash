@@ -57,6 +57,10 @@ class _NavigatorBarState extends State<NavigatorBar> {
         ],
         currentIndex: selectedPage,
         onTap: tapped,
+        selectedItemColor: Color.fromARGB(
+            255, 31, 178, 100), // Set your desired color for selected icons
+        unselectedItemColor:
+            Colors.grey, // Set your desired color for unselected icons
       ),
     );
   }

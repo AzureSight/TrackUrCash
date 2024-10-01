@@ -90,7 +90,7 @@ class Update {
           key: _keyform,
           child: Container(
             width: 350,
-            height: 320,
+            height: 240,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +102,7 @@ class Update {
                     'Update Expense',
                     style: TextStyle(
                       fontFamily: 'Ubuntu',
-                      fontSize: 25,
+                      fontSize: 23,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF001F3F),
                     ),
@@ -126,10 +126,10 @@ class Update {
                         icon: const Icon(Icons.clear)),
                     labelText: 'Expense Details',
                     labelStyle: const TextStyle(
-                      fontFamily: 'Ubuntu',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontFamily: 'Ubuntu',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                     hintText: expensedata['detail'],
                     hintStyle: const TextStyle(
                       fontFamily: 'Ubuntu',
@@ -145,7 +145,7 @@ class Update {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0xFF6F61EF),
+                        color: Color(0xFF23cc71),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -200,10 +200,10 @@ class Update {
                         icon: const Icon(Icons.clear)),
                     labelText: 'Amount',
                     labelStyle: const TextStyle(
-                      fontFamily: 'Ubuntu',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontFamily: 'Ubuntu',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                     hintText: amountAsString,
                     hintStyle: const TextStyle(
                       fontFamily: 'Ubuntu',
@@ -219,7 +219,7 @@ class Update {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0xFF6F61EF),
+                        color: Color(0xFF23cc71),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -252,7 +252,7 @@ class Update {
                   },
                   // validator: _model.textController1Validator.asValidator(context),
                 ),
-                const SizedBox(height: 30), // Spacer
+                const SizedBox(height: 20), // Spacer
                 //END OF AMOUNT DETAIL TEXTFIELD
 
                 //ADD & CANCEL BUTTON HERE
@@ -260,7 +260,7 @@ class Update {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: 110,
+                      width: 115,
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
@@ -287,7 +287,7 @@ class Update {
                         child: const Text(
                           'Cancel',
                           style: TextStyle(
-                            color: Color(0xFF4533EA),
+                            color: Colors.black87,
                             fontFamily: 'Ubuntu',
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -296,11 +296,11 @@ class Update {
                       ),
                     ),
                     Container(
-                      width: 110,
+                      width: 115,
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
-                        color: const Color(0xFF4533EA),
+                        color: const Color(0xFF23cc71),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0xFF33000000),

@@ -66,7 +66,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F61EF),
+        backgroundColor: const Color(0xFF23cc71),
         automaticallyImplyLeading: false,
         title: const Text(
           'Profile',
@@ -139,6 +139,7 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                           Container(
+                            alignment: AlignmentDirectional(0, 0),
                             // decoration: BoxDecoration(
                             //   border: Border.all(
                             //       color: Colors.grey.shade300, width: 2),
@@ -146,7 +147,8 @@ class _ProfileState extends State<Profile> {
                             // ),
                             padding: EdgeInsets.all(16),
                             child: const Text(
-                              '"I am Legend"',
+                              '"A little saved today builds a lot for tomorrow."',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.normal,

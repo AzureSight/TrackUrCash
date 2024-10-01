@@ -142,6 +142,7 @@ class _ExpensesState extends State<Expenses> {
                       fontFamily: 'Ubuntu',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                     hintText: 'Specify your Expenses',
                     hintStyle: const TextStyle(
@@ -158,7 +159,7 @@ class _ExpensesState extends State<Expenses> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0xFF6F61EF),
+                        color: Color(0xFF23cc71),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -196,6 +197,9 @@ class _ExpensesState extends State<Expenses> {
 
                 //AMOUNT DETAIL TEXTFIELD HERE
                 TextFormField(
+                  onChanged: (total) {
+                    setState(() {});
+                  },
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(
                       decimal: true), // Set the keyboard type to numeric
@@ -216,6 +220,7 @@ class _ExpensesState extends State<Expenses> {
                       fontFamily: 'Ubuntu',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                     hintText: 'Enter the Amount',
                     hintStyle: const TextStyle(
@@ -232,7 +237,7 @@ class _ExpensesState extends State<Expenses> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0xFF6F61EF),
+                        color: Color(0xFF23cc71),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -301,7 +306,7 @@ class _ExpensesState extends State<Expenses> {
                           'Cancel',
                           style: TextStyle(
                             fontFamily: 'Ubuntu',
-                            color: Color(0xFF4533EA),
+                            color: Colors.black87,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -313,7 +318,7 @@ class _ExpensesState extends State<Expenses> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
-                        color: const Color(0xFF4533EA),
+                        color: const Color(0xFF23cc71),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0xFF33000000),
@@ -378,7 +383,7 @@ class _ExpensesState extends State<Expenses> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F61EF),
+        backgroundColor: const Color(0xFF23cc71),
         automaticallyImplyLeading: false,
         title: const Text(
           'Expenses',
@@ -396,7 +401,10 @@ class _ExpensesState extends State<Expenses> {
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
         backgroundColor: Color(0xFF23CC71),
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       body: StreamBuilder<Object>(
           stream: firestoreService.getNotesStream(),
@@ -643,7 +651,7 @@ class _ExpensesState extends State<Expenses> {
       //       icon: Icon(
       //         Icons.wallet_rounded,
       //         size: 32,
-      //         color: Color(0xFF6F61EF),
+      //         color: Color(0xFF23cc71),
       //       ),
       //     ),
       //     BottomNavigationBarItem(
@@ -676,7 +684,7 @@ class _ExpensesState extends State<Expenses> {
   }
 }
 
-//TODAY TRANSACTIONS LISTVIEW
+//TODAY TRANSACTIONS LISTVIEW1
 class Todaytransactions extends StatelessWidget {
   Todaytransactions({
     super.key,
@@ -747,27 +755,33 @@ class Todaytransactions extends StatelessWidget {
                             children: [
                               //DIALOG TITLE HERE
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
                                     height: 40,
+                                    alignment: Alignment(0, 0),
                                     child: const Text(
                                       'You tapped an item!',
                                       style: TextStyle(
                                         fontFamily: 'Ubuntu',
-                                        fontSize: 26,
+                                        fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF001F3F),
                                       ),
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close_rounded),
-                                    color: Colors.black,
-                                    iconSize: 25,
-                                    onPressed: () {
-                                      print('IconButton pressed ...');
-                                      Navigator.of(context).pop();
-                                    },
+                                  Container(
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close_rounded),
+                                      color: Colors.black,
+                                      iconSize: 18,
+                                      onPressed: () {
+                                        print('IconButton pressed ...');
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
@@ -785,7 +799,7 @@ class Todaytransactions extends StatelessWidget {
                                     'Would you rather?',
                                     style: TextStyle(
                                       fontFamily: 'Ubuntu',
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -800,8 +814,8 @@ class Todaytransactions extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    width: 130,
-                                    height: 45,
+                                    width: 115,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
                                       color: Color(0xFFFF5963),
@@ -891,8 +905,8 @@ class Todaytransactions extends StatelessWidget {
                                                               .spaceBetween,
                                                       children: [
                                                         Container(
-                                                          width: 130,
-                                                          height: 45,
+                                                          width: 115,
+                                                          height: 40,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -936,8 +950,8 @@ class Todaytransactions extends StatelessWidget {
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'Ubuntu',
-                                                                color: Color(
-                                                                    0xFF4533EA),
+                                                                color: Colors
+                                                                    .black87,
                                                                 fontSize: 18,
                                                                 fontWeight:
                                                                     FontWeight
@@ -947,8 +961,8 @@ class Todaytransactions extends StatelessWidget {
                                                           ),
                                                         ),
                                                         Container(
-                                                          width: 130,
-                                                          height: 45,
+                                                          width: 115,
+                                                          height: 40,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -1053,11 +1067,11 @@ class Todaytransactions extends StatelessWidget {
                                     ),
                                   ),
                                   Container(
-                                    width: 130,
-                                    height: 45,
+                                    width: 115,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
-                                      color: const Color(0xFF4533EA),
+                                      color: const Color(0xFF23cc71),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Color(0xFF33000000),
@@ -1239,11 +1253,12 @@ class Allexpenses extends StatelessWidget {
                                 children: [
                                   Container(
                                     height: 40,
+                                    alignment: Alignment(0, 0),
                                     child: const Text(
                                       'You tapped an item!',
                                       style: TextStyle(
                                         fontFamily: 'Ubuntu',
-                                        fontSize: 26,
+                                        fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF001F3F),
                                       ),
@@ -1252,7 +1267,7 @@ class Allexpenses extends StatelessWidget {
                                   IconButton(
                                     icon: const Icon(Icons.close_rounded),
                                     color: Colors.black,
-                                    iconSize: 25,
+                                    iconSize: 18,
                                     onPressed: () {
                                       print('IconButton pressed ...');
                                       Navigator.of(context).pop();
@@ -1274,7 +1289,7 @@ class Allexpenses extends StatelessWidget {
                                     'Would you like to:',
                                     style: TextStyle(
                                       fontFamily: 'Ubuntu',
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -1289,8 +1304,8 @@ class Allexpenses extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    width: 130,
-                                    height: 45,
+                                    width: 115,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
                                       color: Color(0xFFFF5963),
@@ -1380,8 +1395,8 @@ class Allexpenses extends StatelessWidget {
                                                               .spaceBetween,
                                                       children: [
                                                         Container(
-                                                          width: 130,
-                                                          height: 45,
+                                                          width: 115,
+                                                          height: 40,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -1426,7 +1441,7 @@ class Allexpenses extends StatelessWidget {
                                                                 fontFamily:
                                                                     'Ubuntu',
                                                                 color: Color(
-                                                                    0xFF4533EA),
+                                                                    0xFF23cc71),
                                                                 fontSize: 18,
                                                                 fontWeight:
                                                                     FontWeight
@@ -1436,8 +1451,8 @@ class Allexpenses extends StatelessWidget {
                                                           ),
                                                         ),
                                                         Container(
-                                                          width: 130,
-                                                          height: 45,
+                                                          width: 115,
+                                                          height: 40,
                                                           decoration:
                                                               BoxDecoration(
                                                             borderRadius:
@@ -1541,11 +1556,11 @@ class Allexpenses extends StatelessWidget {
                                     ),
                                   ),
                                   Container(
-                                    width: 130,
-                                    height: 45,
+                                    width: 115,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
-                                      color: const Color(0xFF4533EA),
+                                      color: const Color(0xFF23cc71),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Color(0xFF33000000),
