@@ -56,9 +56,16 @@ class displayrecords extends StatelessWidget {
                         style: TextStyle(color: Colors.grey, fontSize: 13))
                   ],
                 ),
-                Text(
-                  formattedDate,
-                  style: TextStyle(color: Colors.grey),
+                Row(
+                  children: [
+                    Text(
+                      formattedDate,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const Spacer(),
+                    Text("~Budget Description~",
+                        style: TextStyle(color: Colors.black87, fontSize: 12)),
+                  ],
                 )
               ],
             ),

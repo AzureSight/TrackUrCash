@@ -23,6 +23,7 @@ class _BudgetState extends State<Budget> {
 //  int _currentPage = 2;
   final TextEditingController _budgetController = TextEditingController();
   double budget = 0.0;
+  final TextEditingController _budgetdetailController = TextEditingController();
   //DIALOG BOX TO ADD EXPENSES HERE
 
   // void refreshPage() {
@@ -61,7 +62,74 @@ class _BudgetState extends State<Budget> {
                 thickness: 1.5,
               ),
               const SizedBox(height: 10),
+              //EXPENSE DETAIL TEXTFIELD HERE
+              TextFormField(
+                controller: _budgetdetailController,
+                autofocus: true,
+                obscureText: false,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                      onPressed: () {
+                        _budgetdetailController.clear();
+                      },
+                      icon: const Icon(Icons.clear)),
+                  labelText: 'Budget Details',
+                  labelStyle: const TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  hintText: 'Provide a description',
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFF15161E),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFF23cc71),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFF5963),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFF5963),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                style: const TextStyle(
+                  fontFamily: 'Ubuntu',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please provide budget detail';
+                  }
+                  return null; // Return null if the validation passes
+                },
+                // validator: _model.textController1Validator.asValidator(context),
+              ),
               //EXPENSE AMOUNT BUDGET TEXTFIELD HERE
+              const SizedBox(height: 10),
               Form(
                 key: _keyform,
                 child: TextFormField(
@@ -80,14 +148,14 @@ class _BudgetState extends State<Budget> {
                           _budgetController.clear();
                         },
                         icon: const Icon(Icons.clear)),
-                    labelText: 'Budget',
+                    labelText: 'Amount',
                     labelStyle: const TextStyle(
                       fontFamily: 'Ubuntu',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
-                    hintText: 'Set your Budget',
+                    hintText: 'Set your amount',
                     hintStyle: const TextStyle(
                       fontFamily: 'Ubuntu',
                       fontSize: 14,
@@ -138,7 +206,7 @@ class _BudgetState extends State<Budget> {
               ),
               const SizedBox(height: 10), // Spacer
               //END OF AMOUNT BUDGET TEXTFIELD
-
+              const SizedBox(height: 10),
               //ADD & CANCEL BUTTON HERE
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -583,30 +651,49 @@ class _BudgetState extends State<Budget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Column(
                           children: [
-                            const Align(
-                              alignment: AlignmentDirectional(-1.00, -1.00),
-                              child: Text(
-                                'My Budget',
-                                style: TextStyle(
-                                  fontFamily: 'Plus Jakarta Sans',
-                                  color: Color(0xFF001F3F),
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Align(
+                                  alignment: AlignmentDirectional(-1.00, -1.00),
+                                  child: Text(
+                                    'My Budget',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF001F3F),
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  '₱$budget',
+                                  //
+                                  style: const TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF1fb765),
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '₱$budget',
-                              //
-                              style: const TextStyle(
-                                fontFamily: 'Plus Jakarta Sans',
-                                color: Color(0xFF1fb765),
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
+                            Align(
+                              alignment: AlignmentDirectional(-1.00, -1.00),
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                child: Text(
+                                  '~Budget Description~',
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    color: Color(0xFF2E2863),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
