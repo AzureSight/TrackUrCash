@@ -32,6 +32,7 @@ class Update {
     var data = {
       "id": expensedata['id'],
       "detail": detail,
+      "budget": expensedata['budget'],
       "amount": Amount,
       "timestamp": expensedata['timestamp'],
       "monthyear": expensedata['monthyear'],

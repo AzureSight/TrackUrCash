@@ -271,7 +271,7 @@ class _BudgetState extends State<Budget> {
                         if (_keyform.currentState!.validate()) {
                           // Add your Elevated Button functionality here
                           submit();
-                          NotificationService().checkBudget();
+                          NotificationService().notify();
                           Navigator.pop(context);
                         }
                         //
@@ -656,21 +656,21 @@ class _BudgetState extends State<Budget> {
       activeBudgetDescription = activeBudgetDoc['budget_desc'];
     }
 
-    DateTime now = DateTime.now();
-    DateTime startOfToday =
-        DateTime(now.year, now.month, now.day); // Start of current day
-    DateTime endOfToday = DateTime(
-        now.year, now.month, now.day, 23, 59, 59); // End of current day
+    // DateTime now = DateTime.now();
+    // DateTime startOfToday =
+    //     DateTime(now.year, now.month, now.day); // Start of current day
+    // DateTime endOfToday = DateTime(
+    //     now.year, now.month, now.day, 23, 59, 59); // End of current day
     double totalAmount = 0;
     if (activeBudgetQuery.docs.isNotEmpty) {
       QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
           .collection('Users')
           .doc(user.uid)
           .collection('expenses')
-          .where('timestamp',
-              isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
-          .where('timestamp',
-              isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
           .where('budget', isEqualTo: activeBudgetDescription)
           .get();
 
@@ -876,6 +876,8 @@ class _BudgetState extends State<Budget> {
   Future<void> initialize() async {
     await getbudget();
     await fetchexpenses();
+    NotificationService().notify();
+    NotificationService().scheduleMyNotification();
   }
 
   double remaining = 0.0;
@@ -1262,7 +1264,7 @@ class _BudgetState extends State<Budget> {
                                       ),
                                     ),
                                     // Add your icon here (e.g., a currency icon)
-                                    if (expensePercentage >= 90 &&
+                                    if (expensePercentage >= 80 &&
                                         remaining > 0) ...[
                                       const Icon(
                                         Icons
@@ -1270,6 +1272,17 @@ class _BudgetState extends State<Budget> {
                                         size: 20, // Set the icon size to 20
                                         color: Color.fromARGB(
                                             255, 236, 67, 0), // Warning color
+                                      ),
+                                      const SizedBox(
+                                        width:
+                                            4, // Spacing between icon and text
+                                      ),
+                                    ] else if (expensePercentage < 80) ...[
+                                      const Icon(
+                                        Icons.check_circle, // Warning icon
+                                        size: 20, // Set the icon size to 20
+                                        color: Color.fromARGB(
+                                            255, 11, 255, 3), // Warning color
                                       ),
                                       const SizedBox(
                                         width:
@@ -1286,14 +1299,14 @@ class _BudgetState extends State<Budget> {
                                         width:
                                             4, // Spacing between icon and text
                                       ),
-                                    ] else ...[
-                                      const Icon(
-                                        Icons.check_circle,
-                                        // Alternative icon for the else case
-                                        size: 20, // Set the icon size to 20
-                                        color: Color.fromARGB(
-                                            255, 0, 255, 0), // Success color
-                                      ),
+                                      // ] else ...[
+                                      //   const Icon(
+                                      //     Icons.check_circle,
+                                      //     // Alternative icon for the else case
+                                      //     size: 20, // Set the icon size to 20
+                                      //     color: Color.fromARGB(
+                                      //         255, 0, 255, 0), // Success color
+                                      //   ),
                                       const SizedBox(
                                         width:
                                             4, // Spacing between icon and text
@@ -1321,7 +1334,7 @@ class _BudgetState extends State<Budget> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        Color.fromARGB(255, 1, 162, 255),
+                                        const Color.fromARGB(255, 1, 162, 255),
                                     elevation: 10,
                                     padding:
                                         const EdgeInsets.fromLTRB(24, 0, 24, 0),

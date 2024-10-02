@@ -14,7 +14,7 @@ class TodaytransactionsDashboard extends StatelessWidget {
   Update up = Update();
   @override
   Widget build(BuildContext context) {
-    gettotal();
+    // gettotal();
     DateTime now = DateTime.now();
     DateTime startOfToday =
         DateTime(now.year, now.month, now.day); // Start of current day

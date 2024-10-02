@@ -3,6 +3,7 @@ import 'package:finalproject_cst9l/pages/Refreshamount.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
@@ -53,17 +54,72 @@ class NotificationService {
     }
   }
 
-  notificationDetails() {
+  NotificationDetails notificationDetails() {
     return const NotificationDetails(
-        android: AndroidNotificationDetails('channelId', 'channelName',
-            importance: Importance.max),
-        iOS: DarwinNotificationDetails());
+      android: AndroidNotificationDetails(
+        'default_channel', // Replace with your channel ID
+        'Default Channel', // Replace with your channel name
+        importance: Importance.max,
+        priority: Priority.high,
+        showWhen: false,
+      ),
+    );
   }
 
-  Future showNotification(
-      {int id = 0, String? title, String? body, String? payLoad}) async {
+  NotificationDetails scheduledNotificationDetails() {
+    print("CAME HERE lastly");
+    return const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'scheduled_channel', // Unique channel ID for scheduled notifications
+        'Scheduled Notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+      ),
+      iOS: DarwinNotificationDetails(),
+    );
+  }
+
+  Future<void> showNotification({
+    int id = 0,
+    String? title,
+    String? body,
+    String? payload,
+  }) async {
     return notificationsPlugin.show(
-        id, title, body, await notificationDetails());
+      id,
+      title,
+      body,
+      await notificationDetails(),
+    );
+  }
+
+  // Future showNotification(
+  //     {int id = 0, String? title, String? body, String? payLoad}) async {
+  //   return notificationsPlugin.show(
+  //       id, title, body, await notificationDetails());
+  // }
+  Future<void> scheduleNotification({
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+  }) async {
+    await notificationsPlugin.zonedSchedule(
+      2, // Notification ID
+      title,
+      body,
+      tz.TZDateTime.from(
+          scheduledTime, tz.local), // Convert to timezone-aware datetime
+      await scheduledNotificationDetails(),
+      androidAllowWhileIdle: true, // Allow notifications while in Doze mode
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+    print("Current time: ${DateTime.now()}");
+    print("Scheduled time: $scheduledTime");
+    print("Converted time: ${tz.TZDateTime.from(scheduledTime, tz.local)}");
+
+    print("CAME HERE");
   }
 
   Future<double> getbudget() async {
@@ -90,17 +146,57 @@ class NotificationService {
     return newBudget;
   }
 
-  Future<void> checkBudget() async {
+  Future<void> requestExactAlarmPermission() async {
+    // Check if permission is granted
+    var status = await Permission.scheduleExactAlarm.status;
+    if (!status.isGranted) {
+      // Request permission
+      await Permission.scheduleExactAlarm.request();
+    }
+  }
+
+  Future<void> notify() async {
     double total = await fetchexpenses();
     double budget = await fetchbudget();
     double remaining = budget - total;
 
-    if (remaining < budget * 0.5) {
+    if (remaining < budget * 0.5 && remaining > budget * 0.2) {
+      // This case is for when the remaining amount is less than 50% of the budget
       await showNotification(
           title: 'Budget Alert!',
-          body: 'You have exceeded half of your budget!');
-      print("NOTIFIED");
+          body: 'You have exceeded 50% of your budget!');
+      print("NOTIFIED 50");
+    } else if (remaining <= budget * 0.2 && remaining > 0) {
+      await showNotification(
+          title: 'Budget Alert!',
+          body: 'You have exceeded 80% of your budget!');
+      print("NOTIFIED 80");
+    } else if (remaining < 0) {
+      await showNotification(
+          title: 'Budget Alert!', body: 'You have exceeded your budget!');
+      print("NOTIFIED 100");
+    } else if (budget == 0) {
+      await showNotification(
+          title: 'Budget Alert!', body: 'You have no budget set!');
+      print("NOTIFIED NO BUDGET");
+    } else if (remaining < 0) {
+      await showNotification(
+          title: 'Budget Alert!', body: 'You have exceeded your budget!');
+      print("NOTIFIED NEGATIVE");
     }
+  }
+
+  void scheduleMyNotification() {
+    // Schedule the notification for a specific time
+    print("PASSSSSED HERE");
+    DateTime scheduledTime = DateTime.now()
+        .add(Duration(seconds: 10)); // Change to your desired time
+    print("$scheduledTime");
+    NotificationService().scheduleNotification(
+      title: 'Scheduled Notification',
+      body: 'This notification was scheduled!',
+      scheduledTime: scheduledTime,
+    );
   }
 
   Future<double> fetchexpenses() async {
@@ -124,21 +220,21 @@ class NotificationService {
       activeBudgetDescription = activeBudgetDoc['budget_desc'];
     }
 
-    DateTime now = DateTime.now();
-    DateTime startOfToday =
-        DateTime(now.year, now.month, now.day); // Start of current day
-    DateTime endOfToday = DateTime(
-        now.year, now.month, now.day, 23, 59, 59); // End of current day
+    // DateTime now = DateTime.now();
+    // DateTime startOfToday =
+    //     DateTime(now.year, now.month, now.day); // Start of current day
+    // DateTime endOfToday = DateTime(
+    //     now.year, now.month, now.day, 23, 59, 59); // End of current day
 
     if (activeBudgetQuery.docs.isNotEmpty) {
       QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
           .collection('Users')
           .doc(user.uid)
           .collection('expenses')
-          .where('timestamp',
-              isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
-          .where('timestamp',
-              isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
           .where('budget', isEqualTo: activeBudgetDescription)
           .get();
 
@@ -180,7 +276,9 @@ class NotificationService {
       } catch (e) {
         print("Error retrieving data: $e");
       }
+      return newBudget;
+    } else {
+      return newBudget;
     }
-    return newBudget;
   }
 }

@@ -17,22 +17,22 @@ class Transactions_Budget extends StatelessWidget {
   Update up = Update();
   @override
   Widget build(BuildContext context) {
-    gettotal();
-    DateTime now = DateTime.now();
-    DateTime startOfToday =
-        DateTime(now.year, now.month, now.day); // Start of current day
-    DateTime endOfToday = DateTime(
-        now.year, now.month, now.day, 23, 59, 59); // End of current day
+    // gettotal();
+    // DateTime now = DateTime.now();
+    // DateTime startOfToday =
+    //     DateTime(now.year, now.month, now.day); // Start of current day
+    // DateTime endOfToday = DateTime(
+    //     now.year, now.month, now.day, 23, 59, 59); // End of current day
     String desc = data.toString();
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Users')
             .doc(userid)
             .collection('expenses')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
-            .where('timestamp',
-                isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+            // .where('timestamp',
+            //     isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+            // .where('timestamp',
+            //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
             .where('budget', isEqualTo: desc)
             .orderBy("timestamp", descending: false)
             .snapshots(),

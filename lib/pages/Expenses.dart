@@ -58,6 +58,7 @@ class _ExpensesState extends State<Expenses> {
     if (activeBudgetQuery.docs.isNotEmpty) {
       var activeBudgetDoc = activeBudgetQuery.docs.first;
       activeBudgetDescription = activeBudgetDoc['budget_desc'];
+      NotificationService().notify();
     } else {
       // If no active budget is found, set to "Uncategorized"
       activeBudgetDescription = "Uncategorized";
@@ -76,8 +77,6 @@ class _ExpensesState extends State<Expenses> {
         .collection("expenses")
         .doc(id)
         .set(data);
-
-    NotificationService().checkBudget();
   }
 
   Future<double> computeTotalAmount() async {
@@ -707,7 +706,7 @@ class Todaytransactions extends StatelessWidget {
   Update up = Update();
   @override
   Widget build(BuildContext context) {
-    gettotal();
+    // gettotal();
     DateTime now = DateTime.now();
     DateTime startOfToday =
         DateTime(now.year, now.month, now.day); // Start of current day

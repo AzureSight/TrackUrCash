@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:finalproject_cst9l/pages/Fetchbargraphdata.dart';
 import 'package:finalproject_cst9l/pages/fetchweeklydata.dart';
@@ -69,21 +70,21 @@ Future<double> fetchactiveexpenses() async {
     activeBudgetDescription = activeBudgetDoc['budget_desc'];
   }
 
-  DateTime now = DateTime.now();
-  DateTime startOfToday =
-      DateTime(now.year, now.month, now.day); // Start of current day
-  DateTime endOfToday =
-      DateTime(now.year, now.month, now.day, 23, 59, 59); // End of current day
+  // DateTime now = DateTime.now();
+  // DateTime startOfToday =
+  //     DateTime(now.year, now.month, now.day); // Start of current day
+  // DateTime endOfToday =
+  //     DateTime(now.year, now.month, now.day, 23, 59, 59); // End of current day
 
   if (activeBudgetQuery.docs.isNotEmpty) {
     QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
         .collection('Users')
         .doc(user.uid)
         .collection('expenses')
-        .where('timestamp',
-            isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
-        .where('timestamp',
-            isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+        // .where('timestamp',
+        //     isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+        // .where('timestamp',
+        //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
         .where('budget', isEqualTo: activeBudgetDescription)
         .get();
 
@@ -100,20 +101,28 @@ Future<double> fetchactiveexpenses() async {
   return totalAmount;
 }
 
-double total = 0.0;
-double activetotal = 0.0;
-Future<double> gettotal() async {
-  total = await Caltotal();
-  // print('Total amount: $total');
+// double total = 0.0;
+// double activetotal = 0.0;
+// Future<double> gettotal() async {
+//   total = await Caltotal();
+//   // print('Total amount: $total');
+//   return total;
+//   // Use the 'total' variable wherever you need it in your code
+// }
 
-  return total;
-  // Use the 'total' variable wherever you need it in your code
-}
+// Future<double> gettotalActive() async {
+//   activetotal = await fetchactiveexpenses();
+//   return activetotal;
+// }
 
-Future<double> gettotalActive() async {
-  activetotal = await fetchactiveexpenses();
-
-  return activetotal;
+Future<void> notify() async {
+  int notif = 0;
+  if (notif == 0) {
+    notif++;
+    NotificationService().notify();
+  } else {
+    print("TIMES NOTIFIED: $notif");
+  }
 }
 
 class _DashboardState extends State<Dashboard> {
@@ -125,6 +134,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     initializeTotal();
+    NotificationService().scheduleMyNotification();
   }
 
   Future<void> initializeTotal() async {
@@ -132,7 +142,7 @@ class _DashboardState extends State<Dashboard> {
     double activeTotal = await fetchactiveexpenses();
     ExpenseService expenseService = ExpenseService();
     double totalExpenses = await expenseService.getExpensesForCurrentWeek();
-
+    // await notify();
     setState(() {
       tot = totalweek;
       atot = activeTotal;
