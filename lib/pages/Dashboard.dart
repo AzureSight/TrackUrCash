@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:finalproject_cst9l/pages/Fetchbargraphdata.dart';
+import 'package:finalproject_cst9l/pages/fetchweeklydata.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,59 @@ Future<double> Caltotal() async {
   return totalAmount;
 }
 
+Future<double> fetchactiveexpenses() async {
+  final user = FirebaseAuth.instance.currentUser;
+  double totalAmount = 0;
+  await FirebaseFirestore.instance.collection('Users').doc(user!.uid).get();
+
+  QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(user.uid)
+      .collection('budget')
+      .where('status', isEqualTo: 'active')
+      .limit(1) // We expect only one active budget at a time
+      .get();
+
+  String activeBudgetDescription = " ";
+
+  if (activeBudgetQuery.docs.isNotEmpty) {
+    var activeBudgetDoc = activeBudgetQuery.docs.first;
+    activeBudgetDescription = activeBudgetDoc['budget_desc'];
+  }
+
+  DateTime now = DateTime.now();
+  DateTime startOfToday =
+      DateTime(now.year, now.month, now.day); // Start of current day
+  DateTime endOfToday =
+      DateTime(now.year, now.month, now.day, 23, 59, 59); // End of current day
+
+  if (activeBudgetQuery.docs.isNotEmpty) {
+    QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection('expenses')
+        .where('timestamp',
+            isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+        .where('timestamp',
+            isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+        .where('budget', isEqualTo: activeBudgetDescription)
+        .get();
+
+    List<QueryDocumentSnapshot> expenses = expenseSnapshot.docs;
+
+    for (var expense in expenses) {
+      totalAmount += (expense['amount'] as num).toDouble();
+    }
+    totalAmount = totalAmount.toDouble();
+  } else {
+    totalAmount = 0.0;
+  }
+
+  return totalAmount;
+}
+
 double total = 0.0;
+double activetotal = 0.0;
 Future<double> gettotal() async {
   total = await Caltotal();
   // print('Total amount: $total');
@@ -57,10 +110,17 @@ Future<double> gettotal() async {
   // Use the 'total' variable wherever you need it in your code
 }
 
+Future<double> gettotalActive() async {
+  activetotal = await fetchactiveexpenses();
+
+  return activetotal;
+}
+
 class _DashboardState extends State<Dashboard> {
   int _currentPage = 1;
   double tot = 0;
-
+  double atot = 0;
+  double wtot = 0;
   @override
   void initState() {
     super.initState();
@@ -68,9 +128,15 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> initializeTotal() async {
-    double total = await gettotal();
+    double totalweek = await Caltotal();
+    double activeTotal = await fetchactiveexpenses();
+    ExpenseService expenseService = ExpenseService();
+    double totalExpenses = await expenseService.getExpensesForCurrentWeek();
+
     setState(() {
-      tot = total;
+      tot = totalweek;
+      atot = activeTotal;
+      wtot = totalExpenses;
     });
   }
 
@@ -105,7 +171,7 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
               child: Container(
                 width: 500,
-                height: 179,
+                height: 190,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -131,10 +197,10 @@ class _DashboardState extends State<Dashboard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Column(
+                        Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
-                            Align(
+                            const Align(
                               alignment: AlignmentDirectional(-1.00, -1.00),
                               child: Padding(
                                 padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -149,29 +215,62 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                            Align(
-                              alignment: AlignmentDirectional(-1.00, -1.00),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                child: Text(
-                                  'This day',
-                                  style: TextStyle(
-                                    fontFamily: 'Manrope',
-                                    color: Color(0xFF2E2863),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                            // Align(
+                            //   alignment: AlignmentDirectional(-1.00, -1.00),
+                            //   child: Padding(
+                            //     padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            //     child: Text(
+                            //       'This day',
+                            //       style: TextStyle(
+                            //         fontFamily: 'Manrope',
+                            //         color: Color(0xFF2E2863),
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.bold,
+                            //       ),
+                            //     ),
+
+                            //   ),
+                            // ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: Text(
+                                      'This day',
+                                      style: TextStyle(
+                                        fontFamily: 'Manrope',
+                                        color: Color(0xFF2E2863),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    '₱$tot',
+                                    //'₱'
+                                    style: const TextStyle(
+                                      fontFamily: 'Manrope',
+                                      color: Color(0xFF23cc71),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                         const Divider(
-                          thickness: 1.5,
+                          thickness: 1,
                           color: Color(0xFFBDC3C7),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,17 +278,48 @@ class _DashboardState extends State<Dashboard> {
                               const Padding(
                                 padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                                 child: Text(
-                                  'Total Expenses',
+                                  'Total Expenses for This Week',
                                   style: TextStyle(
                                     fontFamily: 'Manrope',
                                     color: Color(0xFF2E2863),
-                                    fontSize: 20,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                               Text(
-                                '₱$tot',
+                                '₱$wtot',
+                                //'₱'
+                                style: const TextStyle(
+                                  fontFamily: 'Manrope',
+                                  color: Color(0xFF23cc71),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                child: Text(
+                                  'Total Expenses for Active Budget',
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    color: Color(0xFF2E2863),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '₱$atot',
                                 //'₱'
                                 style: const TextStyle(
                                   fontFamily: 'Manrope',
@@ -243,10 +373,10 @@ class _DashboardState extends State<Dashboard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                               child: Text(
                                 'Spending Report',

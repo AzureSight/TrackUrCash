@@ -309,6 +309,282 @@ class _BudgetState extends State<Budget> {
     });
   }
 
+  void updatebudget() {
+    _budgetController.text = budget.toString();
+    _budgetdetailController.text = budgetdesc.toString();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Container(
+          width: 500,
+          height: 250,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              //DIALOG TITLE HERE
+              Container(
+                height: 35,
+                child: const Text(
+                  'Update Budget',
+                  style: TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF001F3F),
+                  ),
+                ),
+              ),
+              //END OF DIALOG TITLE
+              const Divider(
+                color: Colors.black87,
+                thickness: 1.5,
+              ),
+              const SizedBox(height: 10),
+
+//EXPENSE DETAIL TEXTFIELD HERE
+              TextFormField(
+                controller: _budgetdetailController,
+                autofocus: true,
+                obscureText: false,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                      onPressed: () {
+                        _budgetdetailController.clear();
+                      },
+                      icon: const Icon(Icons.clear)),
+                  labelText: 'Budget Description',
+                  labelStyle: const TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  hintText: 'Provide a description',
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFF15161E),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFF23cc71),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFF5963),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFF5963),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                style: const TextStyle(
+                  fontFamily: 'Ubuntu',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please provide budget detail';
+                  }
+                  return null; // Return null if the validation passes
+                },
+                // validator: _model.textController1Validator.asValidator(context),
+              ),
+              //EXPENSE AMOUNT BUDGET TEXTFIELD HERE
+              const SizedBox(height: 10),
+
+              //EXPENSE AMOUNT BUDGET TEXTFIELD HERE
+              Form(
+                key: _keyform,
+                child: TextFormField(
+                  controller: _budgetController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true), // Set the keyboard type to numeric
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(
+                        r'^\d*\.?\d{0,2}')), // Allow up to 2 decimal places
+                  ],
+                  autofocus: true,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        onPressed: () {
+                          _budgetController.clear();
+                        },
+                        icon: const Icon(Icons.clear)),
+                    labelText: 'Amount',
+                    labelStyle: const TextStyle(
+                      fontFamily: 'Ubuntu',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    hintText: 'Set your budget amount',
+                    hintStyle: const TextStyle(
+                      fontFamily: 'Ubuntu',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Color(0xFF15161E),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Color(0xFF23cc71),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Color(0xFFFF5963),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Color(0xFFFF5963),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  style: const TextStyle(
+                    fontFamily: 'Ubuntu',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter desired Budget';
+                    }
+                    return null; // Return null if the validation passes
+                  },
+                  // validator: _model.textController1Validator.asValidator(context),
+                ),
+              ),
+              const SizedBox(height: 10), // Spacer
+              //END OF AMOUNT BUDGET TEXTFIELD
+
+              //ADD & CANCEL BUTTON HERE
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 110,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0xFF33000000),
+                          offset: Offset(0, 2),
+                          blurRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 110,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0xFF33000000),
+                          offset: Offset(0, 2),
+                          blurRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_keyform.currentState!.validate()) {
+                          // Add your Elevated Button functionality here
+                          submitreset();
+                          Navigator.pop(context);
+                        }
+                        //
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF23cc71),
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      child: const Text(
+                        'Set',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              //END OF ADD & CANCEL BUTTON
+            ],
+          ),
+        ),
+      ),
+    ).then((value) {
+      // This code executes after the dialog is closed
+      // Refresh the page by calling the refresh method
+      // getbudget();
+      //refreshPage();
+    });
+  }
+
   Future<void> getbudget() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -481,41 +757,54 @@ class _BudgetState extends State<Budget> {
 
     if (user != null) {
       try {
-        // Retrieve all documents from the 'Users' collection
-        DocumentSnapshot userDocument = await FirebaseFirestore.instance
-            .collection("Users")
+        var amount = double.parse(_budgetController.text);
+        var desc = _budgetdetailController.text;
+        String olddesc;
+        // Query for the active budget
+        QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+            .collection('Users')
             .doc(user.uid)
+            .collection('budget')
+            .where('status', isEqualTo: 'active')
+            .limit(1) // We expect only one active budget at a time
             .get();
 
-        // Iterate through each document in the collection
-        if (userDocument.exists) {
-          Map<String, dynamic> userData =
-              userDocument.data() as Map<String, dynamic>;
-          // Retrieve 'name' field from the document
-          String? userName = userData['name'];
+        // Check if we found an active budget
+        if (activeBudgetQuery.docs.isNotEmpty) {
+          // Retrieve the first (and only) active budget document
+          DocumentSnapshot activeBudgetDoc = activeBudgetQuery.docs.first;
+          olddesc = activeBudgetDoc['budget_desc'];
+          print("THIS IS THE OLD DESCRIPTION$olddesc");
+          // Update the active budget's amount and description
+          await activeBudgetDoc.reference.update({
+            'budget_amount': amount,
+            'budget_desc': desc,
+          });
 
-          // Here, you might want to match the user ID with the current user's ID
-          if (userName != null) {
-            double resetbudget = 0;
-            // DateTime date = DateTime.now();
+          QuerySnapshot existingBudgetsExpense = await FirebaseFirestore
+              .instance
+              .collection('Users')
+              .doc(user.uid)
+              .collection('expenses')
+              .where('budget', isEqualTo: olddesc)
+              .get();
 
-            var data = {
-              "email":
-                  user.email ?? "", // Using email from Firebase Authentication
-              "name": userName, // Using the 'name' field from Firestore
-              "budget": resetbudget,
-              // Other fields you want to add to Firestore
-            };
+          WriteBatch batch2 = FirebaseFirestore.instance.batch();
 
-            // Update Firestore document
-            await FirebaseFirestore.instance
-                .collection("Users")
-                .doc(user.uid)
-                .set(data);
-            getbudget();
-            _budgetController.clear();
+          for (var doc in existingBudgetsExpense.docs) {
+            batch2.update(doc.reference, {'budget': desc});
           }
+          await batch2.commit();
+
+          _budgetController.clear();
+          _budgetdetailController.clear();
+          print("Active budget updated successfully.");
+        } else {
+          print("No active budget found.");
         }
+
+        getbudget();
+        _budgetController.clear();
       } catch (e) {
         print("Error retrieving data: $e");
       }
@@ -545,9 +834,29 @@ class _BudgetState extends State<Budget> {
         for (var doc in existingBudgets.docs) {
           batch.update(doc.reference, {'status': 'completed'});
         }
-
         await batch.commit();
+        QuerySnapshot existingBudgetsExpense = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .collection('expenses')
+            .get();
 
+        WriteBatch batch2 = FirebaseFirestore.instance.batch();
+        for (var doc in existingBudgetsExpense.docs) {
+          String expenseBudgetDesc = doc['budget'];
+
+          // String cleanedBudgetDesc = expenseBudgetDesc.replaceAll(' + - ', '');
+
+          if (expenseBudgetDesc.length > 12) {
+            // Remove the last 12 characters from the budget description
+            expenseBudgetDesc =
+                expenseBudgetDesc.substring(0, expenseBudgetDesc.length - 12);
+          }
+
+          batch2.update(
+              doc.reference, {'budget': '$expenseBudgetDesc - completed'});
+        }
+        await batch2.commit();
         getbudget();
         _budgetController.clear();
       } catch (e) {
@@ -562,7 +871,6 @@ class _BudgetState extends State<Budget> {
   void initState() {
     super.initState();
     initialize();
-    NotificationService().checkBudget();
   }
 
   Future<void> initialize() async {
@@ -641,7 +949,7 @@ class _BudgetState extends State<Budget> {
                   completed();
                   getbudget();
                   fetchexpenses();
-                  NotificationService().checkBudget();
+                  // NotificationService().checkBudget();
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
@@ -771,11 +1079,11 @@ class _BudgetState extends State<Budget> {
                       children: [
                         Column(
                           children: [
-                            Row(
+                            const Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Align(
+                                Align(
                                   alignment: AlignmentDirectional(-1.00, -1.00),
                                   child: Text(
                                     'My Budget',
@@ -787,34 +1095,36 @@ class _BudgetState extends State<Budget> {
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  '₱$budget',
-                                  //
-                                  style: const TextStyle(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF1fb765),
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                               ],
                             ),
-                            Align(
-                              alignment:
-                                  const AlignmentDirectional(-1.00, -1.00),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                child: Text(
-                                  budgetdesc,
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  child: Text(
+                                    budgetdesc, // Make sure 'budgetdesc' is a valid variable
+                                    style: const TextStyle(
+                                      fontFamily: 'Manrope',
+                                      color: Color(0xFF2E2863),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '₱$budget', // Ensure 'tot' is passed to the widget
                                   style: const TextStyle(
                                     fontFamily: 'Manrope',
-                                    color: Color(0xFF2E2863),
+                                    color: Color(0xFF23cc71),
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            ),
+                              ],
+                            )
                           ],
                         ),
 
@@ -958,8 +1268,31 @@ class _BudgetState extends State<Budget> {
                                         Icons
                                             .warning_amber_rounded, // Warning icon
                                         size: 20, // Set the icon size to 20
-                                        color:
-                                            Color(0xFFFF5963), // Warning color
+                                        color: Color.fromARGB(
+                                            255, 236, 67, 0), // Warning color
+                                      ),
+                                      const SizedBox(
+                                        width:
+                                            4, // Spacing between icon and text
+                                      ),
+                                    ] else if (remaining < 0) ...[
+                                      const Icon(
+                                        Icons.money_off, // Thumbs down icon
+                                        size: 20, // Set the icon size to 20
+                                        color: Color.fromARGB(255, 233, 0,
+                                            0), // Neutral warning color
+                                      ),
+                                      const SizedBox(
+                                        width:
+                                            4, // Spacing between icon and text
+                                      ),
+                                    ] else ...[
+                                      const Icon(
+                                        Icons.check_circle,
+                                        // Alternative icon for the else case
+                                        size: 20, // Set the icon size to 20
+                                        color: Color.fromARGB(
+                                            255, 0, 255, 0), // Success color
                                       ),
                                       const SizedBox(
                                         width:
@@ -984,17 +1317,18 @@ class _BudgetState extends State<Budget> {
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    submitreset();
+                                    updatebudget();
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF5963),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 1, 162, 255),
                                     elevation: 10,
                                     padding:
                                         const EdgeInsets.fromLTRB(24, 0, 24, 0),
                                     fixedSize: const Size(140, 50),
                                   ),
                                   child: const Text(
-                                    'Reset',
+                                    'Update',
                                     style: TextStyle(
                                       fontFamily: 'Readex Pro',
                                       fontWeight: FontWeight.bold,

@@ -30,7 +30,7 @@ class TodaytransactionsDashboard extends StatelessWidget {
                 isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
             .where('timestamp',
                 isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
-            .orderBy("timestamp", descending: false)
+            .orderBy("timestamp", descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {

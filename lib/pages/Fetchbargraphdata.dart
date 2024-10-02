@@ -47,7 +47,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
     print(startOfThisWeek);
 
     DateTime endOfThisWeek = startOfThisWeek
-        .add(Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+        .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
     print(endOfThisWeek);
 
     // DateTime startOfThisWeekUTC = startOfThisWeek.toUtc();

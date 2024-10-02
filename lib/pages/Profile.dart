@@ -55,6 +55,7 @@ Future<void> userdetails() async {
 }
 
 class _ProfileState extends State<Profile> {
+  @override
   void initState() {
     super.initState();
     userdetails();

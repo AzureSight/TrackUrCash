@@ -91,16 +91,96 @@ class NotificationService {
   }
 
   Future<void> checkBudget() async {
-    var reff = Refresh();
-
-    double total = await reff.taketotal();
-    double budget = await getbudget();
+    double total = await fetchexpenses();
+    double budget = await fetchbudget();
     double remaining = budget - total;
 
     if (remaining < budget * 0.5) {
       await showNotification(
-          title: 'Budget Alert', body: 'BUDGET NOTIF TESTING!');
+          title: 'Budget Alert!',
+          body: 'You have exceeded half of your budget!');
       print("NOTIFIED");
     }
+  }
+
+  Future<double> fetchexpenses() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).get();
+    double totalAmount = 0;
+
+    QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .collection('budget')
+        .where('status', isEqualTo: 'active')
+        .limit(1) // We expect only one active budget at a time
+        .get();
+
+    String activeBudgetDescription = " ";
+
+    if (activeBudgetQuery.docs.isNotEmpty) {
+      var activeBudgetDoc = activeBudgetQuery.docs.first;
+      activeBudgetDescription = activeBudgetDoc['budget_desc'];
+    }
+
+    DateTime now = DateTime.now();
+    DateTime startOfToday =
+        DateTime(now.year, now.month, now.day); // Start of current day
+    DateTime endOfToday = DateTime(
+        now.year, now.month, now.day, 23, 59, 59); // End of current day
+
+    if (activeBudgetQuery.docs.isNotEmpty) {
+      QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.uid)
+          .collection('expenses')
+          .where('timestamp',
+              isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+          .where('timestamp',
+              isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+          .where('budget', isEqualTo: activeBudgetDescription)
+          .get();
+
+      List<QueryDocumentSnapshot> expenses = expenseSnapshot.docs;
+
+      for (var expense in expenses) {
+        totalAmount += (expense['amount'] as num).toDouble();
+      }
+    } else {}
+    return totalAmount;
+  }
+
+  Future<double> fetchbudget() async {
+    final user = FirebaseAuth.instance.currentUser;
+    double newBudget = 0;
+    if (user != null) {
+      try {
+        // Retrieve all documents from the 'users' collection
+        QuerySnapshot userDocument = await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(user.uid)
+            .collection("budget")
+            .where("status", isEqualTo: "active")
+            .get();
+
+        if (userDocument.docs.isNotEmpty) {
+          var activeBudget = userDocument.docs.first;
+          print("Active Budget Data: ${activeBudget.data()}");
+          Map<String, dynamic> userData =
+              activeBudget.data() as Map<String, dynamic>;
+
+          // Check if the value is stored as an int, and convert it to double if necessary
+          newBudget = userData['budget_amount'] is int
+              ? (userData['budget_amount'] as int)
+                  .toDouble() // Convert int to double
+              : userData['budget_amount']
+                  as double; // If it's already a double, no need to convert
+        } else {}
+      } catch (e) {
+        print("Error retrieving data: $e");
+      }
+    }
+    return newBudget;
   }
 }
