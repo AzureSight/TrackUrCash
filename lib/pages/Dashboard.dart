@@ -6,6 +6,7 @@ import 'package:finalproject_cst9l/pages/fetchweeklydata.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -115,15 +116,15 @@ Future<double> fetchactiveexpenses() async {
 //   return activetotal;
 // }
 
-Future<void> notify() async {
-  int notif = 0;
-  if (notif == 0) {
-    notif++;
-    NotificationService().notify();
-  } else {
-    print("TIMES NOTIFIED: $notif");
-  }
-}
+// Future<void> notify() async {
+//   int notif = 0;
+//   if (notif == 0) {
+//     notif++;
+//     NotificationService().notify();
+//   } else {
+//     print("TIMES NOTIFIED: $notif");
+//   }
+// }
 
 class _DashboardState extends State<Dashboard> {
   int _currentPage = 1;
@@ -134,7 +135,11 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     initializeTotal();
-    NotificationService().scheduleMyNotification();
+    // NotificationService().repeatNotification();
+    // NotificationService().daily();
+    // NotificationService().scheduleMyNotification();
+
+    // NotificationService().pendingNotification();
   }
 
   Future<void> initializeTotal() async {
@@ -154,6 +159,21 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     //Caltotal();
+    String formattedtot = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(tot);
+    String formattedatot = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(atot);
+    String formattedwtot = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(wtot);
 
     return Scaffold(
       appBar: AppBar(
@@ -261,7 +281,8 @@ class _DashboardState extends State<Dashboard> {
                                     ),
                                   ),
                                   Text(
-                                    '₱$tot',
+                                    // '₱$tot',
+                                    formattedtot,
                                     //'₱'
                                     style: const TextStyle(
                                       fontFamily: 'Manrope',
@@ -298,7 +319,8 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               Text(
-                                '₱$wtot',
+                                // '₱$wtot',
+                                formattedwtot,
                                 //'₱'
                                 style: const TextStyle(
                                   fontFamily: 'Manrope',
@@ -329,7 +351,8 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                               Text(
-                                '₱$atot',
+                                // '₱$atot',
+                                formattedatot,
                                 //'₱'
                                 style: const TextStyle(
                                   fontFamily: 'Manrope',

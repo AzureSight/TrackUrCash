@@ -3,8 +3,8 @@ import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,9 @@ Future<void> main() async {
   await initializeNotifications();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Manila'));
-
+  NotificationService().repeatNotification();
+  NotificationService().daily();
+  NotificationService().scheduleMyNotification();
   runApp(const MyApp());
 }
 

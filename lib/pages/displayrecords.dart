@@ -16,6 +16,14 @@ class displayrecords extends StatelessWidget {
     // .add(Duration(hours: 8));
 
     String formattedDate = DateFormat('d MMM hh:mma').format(date);
+
+    // Format the amount with commas
+    String formattedAmount = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(data['amount']);
+
     return GestureDetector(
       onTap: onSelect, // Trigger of function on tap
 
@@ -52,7 +60,9 @@ class displayrecords extends StatelessWidget {
                     const Text("Amount",
                         style: TextStyle(color: Colors.grey, fontSize: 13)),
                     const Spacer(),
-                    Text("₱${data['amount']}",
+                    Text(
+                        // "₱${data['amount']}",
+                        formattedAmount,
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 13))
                   ],

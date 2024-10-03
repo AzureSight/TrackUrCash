@@ -8,6 +8,7 @@ import 'package:finalproject_cst9l/pages/Transactions_budget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 //import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -271,7 +272,7 @@ class _BudgetState extends State<Budget> {
                         if (_keyform.currentState!.validate()) {
                           // Add your Elevated Button functionality here
                           submit();
-                          NotificationService().notify();
+                          NotificationService().schedulenotify();
                           Navigator.pop(context);
                         }
                         //
@@ -839,6 +840,7 @@ class _BudgetState extends State<Budget> {
             .collection('Users')
             .doc(user.uid)
             .collection('expenses')
+            // .where('budget', isNotEqualTo: 'testing ')
             .get();
 
         WriteBatch batch2 = FirebaseFirestore.instance.batch();
@@ -855,6 +857,8 @@ class _BudgetState extends State<Budget> {
 
           batch2.update(
               doc.reference, {'budget': '$expenseBudgetDesc - completed'});
+          // doc.reference,
+          // {'budget': expenseBudgetDesc});
         }
         await batch2.commit();
         getbudget();
@@ -876,8 +880,8 @@ class _BudgetState extends State<Budget> {
   Future<void> initialize() async {
     await getbudget();
     await fetchexpenses();
-    NotificationService().notify();
-    NotificationService().scheduleMyNotification();
+    NotificationService().schedulenotify();
+    // NotificationService().scheduleMyNotification();
   }
 
   double remaining = 0.0;
@@ -890,6 +894,24 @@ class _BudgetState extends State<Budget> {
     } else {
       remaining = budget - tot;
     }
+
+    String formattedbudget = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(budget);
+
+    String formattedexp = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(tot);
+
+    String formattedremaining = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(remaining);
 
     double roundedRemaining = double.parse(remaining.toStringAsFixed(2));
     double savings = remaining;
@@ -951,7 +973,6 @@ class _BudgetState extends State<Budget> {
                   completed();
                   getbudget();
                   fetchexpenses();
-                  // NotificationService().checkBudget();
                   Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
@@ -1117,7 +1138,8 @@ class _BudgetState extends State<Budget> {
                                   ),
                                 ),
                                 Text(
-                                  '₱$budget', // Ensure 'tot' is passed to the widget
+                                  // '₱$budget', // Ensure 'tot' is passed to the widget
+                                  formattedbudget,
                                   style: const TextStyle(
                                     fontFamily: 'Manrope',
                                     color: Color(0xFF23cc71),
@@ -1175,7 +1197,8 @@ class _BudgetState extends State<Budget> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
                                 child: Text(
-                                  '₱$budget',
+                                  // '₱$budget',
+                                  formattedbudget,
                                   // ₱
                                   style: const TextStyle(
                                     fontFamily: 'Ubuntu',
@@ -1213,7 +1236,8 @@ class _BudgetState extends State<Budget> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
                                 child: Text(
-                                  '₱$tot',
+                                  // '₱$tot',
+                                  formattedexp,
                                   // ₱
                                   style: const TextStyle(
                                     fontFamily: 'Ubuntu',
@@ -1255,7 +1279,8 @@ class _BudgetState extends State<Budget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '₱$roundedRemaining',
+                                      // '₱$roundedRemaining',
+                                      formattedremaining,
                                       style: const TextStyle(
                                         fontFamily: 'Ubuntu',
                                         color: Color(0xFF1fb765),

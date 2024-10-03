@@ -34,11 +34,12 @@ class Transactions_Budget extends StatelessWidget {
             // .where('timestamp',
             //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
             .where('budget', isEqualTo: desc)
-            .orderBy("timestamp", descending: false)
+            .orderBy("timestamp", descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return const Center(child: Text('Something went wrong'));
+            // return Center(child: Text('${snapshot.error}'));
+            return const Center(child: Text("Something went wrong"));
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: Text("loading"));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
