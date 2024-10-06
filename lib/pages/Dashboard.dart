@@ -465,7 +465,7 @@ class _DashboardState extends State<Dashboard> {
                           color: Color(0xFFBDC3C7),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(20.0),
+                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                           child: SizedBox(
                             height: 290,
                             child: MyBarGraph(),
@@ -485,10 +485,10 @@ class _DashboardState extends State<Dashboard> {
           Align(
             alignment: const AlignmentDirectional(0.00, 0.00),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
               child: Container(
                 width: 500,
-                height: 360,
+                height: 400,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -537,7 +537,7 @@ class _DashboardState extends State<Dashboard> {
                         Container(
                           color: const Color.fromARGB(255, 255, 255, 255),
                           height:
-                              230, // Replace with an appropriate fixed height
+                              400, // Replace with an appropriate fixed height
                           child: TodaytransactionsDashboard(),
                         ),
                       ],
