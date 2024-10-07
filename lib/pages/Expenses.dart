@@ -45,6 +45,25 @@ class _ExpensesState extends State<Expenses> {
     print(_expensedetailController.text.toString());
     await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
 
+    // QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
+    //     .collection('Users')
+    //     .doc(User.uid)
+    //     .collection('budget')
+    //     .where('status', isEqualTo: 'active')
+    //     .limit(1) // We expect only one active budget at a time
+    //     .get();
+
+    // String activeBudgetDescription;
+
+    // if (activeBudgetQuery.docs.isNotEmpty) {
+    //   var activeBudgetDoc = activeBudgetQuery.docs.first;
+    //   activeBudgetDescription = activeBudgetDoc['budget_desc'];
+    //   NotificationService().notify();
+    // } else {
+    //   // If no active budget is found, set to "Uncategorized"
+    //   activeBudgetDescription = "Uncategorized";
+    // }
+
     QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
         .collection('Users')
         .doc(User.uid)
@@ -54,15 +73,19 @@ class _ExpensesState extends State<Expenses> {
         .get();
 
     String activeBudgetDescription;
+    String activeBudgetID;
 
     if (activeBudgetQuery.docs.isNotEmpty) {
       var activeBudgetDoc = activeBudgetQuery.docs.first;
+
       activeBudgetDescription = activeBudgetDoc['budget_desc'];
-      NotificationService().notify();
+      activeBudgetID = activeBudgetDoc.id;
     } else {
       // If no active budget is found, set to "Uncategorized"
       activeBudgetDescription = "Uncategorized";
+      activeBudgetID = "No available id";
     }
+
     var data = {
       "id": id,
       "detail": detail,
@@ -70,6 +93,7 @@ class _ExpensesState extends State<Expenses> {
       "timestamp": timestamp,
       "monthyear": monthyear,
       "budget": activeBudgetDescription,
+      "budget_id": activeBudgetID,
     };
     await FirebaseFirestore.instance
         .collection("Users")
@@ -77,6 +101,8 @@ class _ExpensesState extends State<Expenses> {
         .collection("expenses")
         .doc(id)
         .set(data);
+
+    NotificationService().notify();
   }
 
   Future<double> computeTotalAmount() async {
@@ -390,7 +416,101 @@ class _ExpensesState extends State<Expenses> {
       ),
     );
   }
-  //END OF DIALOG BOX
+
+  @override
+  void initState() {
+    super.initState();
+    initialize();
+  }
+
+  Future<void> initialize() async {
+    await fetchBudgetOptions();
+    setState(() {});
+  }
+
+  // //END OF DIALOG BOX
+  // String? selectedBudget; // Holds the selected budget option
+  // List<String> budgetOptions = [];
+
+  // Future<void> fetchBudgetOptions() async {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     try {
+  //       QuerySnapshot userDocument = await FirebaseFirestore.instance
+  //           .collection("Users")
+  //           .doc(user.uid)
+  //           .collection("budget")
+  //           .orderBy('created_at', descending: true)
+  //           .limit(5)
+  //           .get();
+
+  //       setState(() {
+  //         // Clear existing options
+  //         budgetOptions.clear();
+  //         budgetOptions.add("Default - all");
+  //         // Iterate through the documents and add budget_desc to the options list
+  //         for (var doc in userDocument.docs) {
+  //           // Assuming each document has a field named 'budget_desc'
+  //           String budgetDesc = doc['budget_desc'] ??
+  //               'No description'; // Fallback if field is null
+  //           budgetOptions.add(budgetDesc);
+  //           print(budgetDesc);
+  //         }
+  //       });
+  //       // Update the state to reflect changes in the UI
+  //     } catch (e) {
+  //       print(
+  //           "Error fetching budget options: $e"); // Handle errors appropriately
+  //     }
+  //   }
+  // }
+  String? selectedBudget = 'null';
+  List<Map<String, String>> budgetOptions =
+      []; // Holds both budget_desc and docId
+
+  Future<void> fetchBudgetOptions() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        QuerySnapshot userDocument = await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(user.uid)
+            .collection("budget")
+            .orderBy('created_at', descending: true)
+            .limit(5)
+            .get();
+
+        setState(() {
+          // Clear existing options
+          budgetOptions.clear();
+
+          // Add a default value with null id
+          budgetOptions.add({
+            "budget_desc": "Default - all",
+            "doc_id": "null"
+          }); // di mugana kay way doc id ang static
+          budgetOptions.add({"budget_desc": "Uncategorized", "doc_id": "0"});
+          // Iterate through the documents and add both budget_desc and docId
+          for (var doc in userDocument.docs) {
+            String budgetDesc = doc['budget_desc'] ??
+                'No description'; // Fallback if field is null
+            String docId = doc.id; // Get the document ID
+
+            // Add both budget_desc and docId to the budgetOptions list
+            budgetOptions.add({
+              "budget_desc": budgetDesc,
+              "doc_id": docId,
+            });
+
+            // print("Budget Desc: $budgetDesc, Doc ID: $docId");
+          }
+        });
+      } catch (e) {
+        print(
+            "Error fetching budget options: $e"); // Handle errors appropriately
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -407,13 +527,13 @@ class _ExpensesState extends State<Expenses> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [],
+        actions: const [],
         centerTitle: false,
         elevation: 2,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
-        backgroundColor: Color(0xFF23CC71),
+        backgroundColor: const Color(0xFF23CC71),
         child: const Icon(
           Icons.add,
           color: Colors.white,
@@ -501,7 +621,7 @@ class _ExpensesState extends State<Expenses> {
                                     icon: const Icon(Icons.edit),
                                     iconSize: 40,
                                     onPressed: () {
-                                      print('IconButton pressed ...');
+                                      // print('IconButton pressed ...');
                                     },
                                   ),
                                 ],
@@ -513,7 +633,7 @@ class _ExpensesState extends State<Expenses> {
                               Container(
                                 color: const Color.fromARGB(255, 255, 255, 255),
                                 height:
-                                    300, // Replace with an appropriate fixed height
+                                    330, // Replace with an appropriate fixed height
                                 child: Todaytransactions(),
                               ),
                             ],
@@ -578,8 +698,86 @@ class _ExpensesState extends State<Expenses> {
                                     icon: const Icon(Icons.edit),
                                     iconSize: 40,
                                     onPressed: () {
-                                      print('IconButton pressed ...');
+                                      // print('IconButton pressed ...');
                                     },
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Padding(
+                                  //   padding:
+                                  //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  //   child: Text(
+                                  //     budgetdesc, // Make sure 'budgetdesc' is a valid variable
+                                  //     style: const TextStyle(
+                                  //       fontFamily: 'Manrope',
+                                  //       color: Color(0xFF2E2863),
+                                  //       fontSize: 16,
+                                  //       fontWeight: FontWeight.bold,
+                                  //     ),
+                                  //   ),
+                                  // ),
+
+                                  // //dropdown
+                                  // Padding(
+                                  //   padding:
+                                  //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  //   child: DropdownButton<String>(
+                                  //     // Display the selected value or hint if none is selected
+                                  //     value: selectedBudget,
+                                  //     hint: const Text(
+                                  //         "Select Budget Description"),
+                                  //     onChanged: (String? newValue) {
+                                  //       setState(() {
+                                  //         print(newValue);
+                                  //         selectedBudget =
+                                  //             newValue; // Update the selected value
+                                  //         // budgetdesc = newValue ??
+                                  //         //     ""; // Update the budgetdesc
+                                  //       });
+                                  //     },
+                                  //     items: budgetOptions
+                                  //         .map<DropdownMenuItem<String>>(
+                                  //             (String value) {
+                                  //       return DropdownMenuItem<String>(
+                                  //         value: value,
+                                  //         child: Text(value),
+                                  //       );
+                                  //     }).toList(),
+                                  //   ),
+                                  // ),
+                                  // //dropdownold
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                    child: DropdownButton<String>(
+                                      // Display the selected value or hint if none is selected
+                                      value: selectedBudget,
+                                      hint: const Text(
+                                          "Select Budget Description"),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          // print("$newValue");
+                                          selectedBudget = newValue;
+
+                                          // Update the selected value (doc_id)
+                                        });
+                                      },
+                                      items: budgetOptions
+                                          .map<DropdownMenuItem<String>>(
+                                              (Map<String, String> budget) {
+                                        return DropdownMenuItem<String>(
+                                          value: budget[
+                                              'doc_id'], // Use doc_id as the value
+                                          child: Text(budget[
+                                              'budget_desc']!), // Display the budget_desc in the dropdown
+                                        );
+                                      }).toList(),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -590,8 +788,8 @@ class _ExpensesState extends State<Expenses> {
                               Container(
                                 color: const Color.fromARGB(255, 255, 255, 255),
                                 height:
-                                    300, // Replace with an appropriate fixed height
-                                child: Allexpenses(),
+                                    290, // Replace with an appropriate fixed height
+                                child: BudgetExpenses(id: selectedBudget),
                               ),
                             ],
                           ),
@@ -753,7 +951,7 @@ class Todaytransactions extends StatelessWidget {
               return displayrecords(
                 data: expensedata,
                 onSelect: () {
-                  print("tapped");
+                  // print("tapped");
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -774,7 +972,7 @@ class Todaytransactions extends StatelessWidget {
                                 children: [
                                   Container(
                                     height: 40,
-                                    alignment: Alignment(0, 0),
+                                    alignment: const Alignment(0, 0),
                                     child: const Text(
                                       'You tapped an item!',
                                       style: TextStyle(
@@ -791,7 +989,7 @@ class Todaytransactions extends StatelessWidget {
                                       color: Colors.black,
                                       iconSize: 18,
                                       onPressed: () {
-                                        print('IconButton pressed ...');
+                                        // print('IconButton pressed ...');
                                         Navigator.of(context).pop();
                                       },
                                     ),
@@ -809,7 +1007,7 @@ class Todaytransactions extends StatelessWidget {
                                 height: 30,
                                 child: const Center(
                                   child: Text(
-                                    'Would you rather?',
+                                    'Would you like to:',
                                     style: TextStyle(
                                       fontFamily: 'Ubuntu',
                                       fontSize: 20,
@@ -831,7 +1029,7 @@ class Todaytransactions extends StatelessWidget {
                                     height: 40,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
-                                      color: Color(0xFFFF5963),
+                                      color: const Color(0xFFFF5963),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Color(0xFF33000000),
@@ -844,7 +1042,7 @@ class Todaytransactions extends StatelessWidget {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         // Implement logic to delete the item
-                                        print("Delete");
+                                        // print("Delete");
 
                                         Navigator.of(context).pop();
                                         showDialog(
@@ -1095,7 +1293,7 @@ class Todaytransactions extends StatelessWidget {
                                     ),
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        print("updateee");
+                                        // print("updateee");
                                         Navigator.of(context).pop();
                                         up.openNoteBox(context, expensedata);
                                       },
@@ -1203,22 +1401,529 @@ class Todaytransactions extends StatelessWidget {
         });
   }
 }
+// ------------------------------------------------------------------------------ WITH UPDATE TO SIYA AND ALL EXPENSE LANG ------------------------------------------------------------------------------
+// class Allexpenses extends StatelessWidget {
+//   Allexpenses({
+//     super.key,
+//   });
+//   final userid = FirebaseAuth.instance.currentUser!.uid;
+//   Update up = Update();
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<QuerySnapshot>(
+//         stream: FirebaseFirestore.instance
+//             .collection('Users')
+//             .doc(userid)
+//             .collection('expenses')
+//             .orderBy("timestamp", descending: false)
+//             .snapshots(),
+//         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//           if (snapshot.hasError) {
+//             return const Center(child: Text('Something went wrong'));
+//           } else if (snapshot.connectionState == ConnectionState.waiting) {
+//             return const Center(child: Text("loading"));
+//           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+//             return const Center(child: Text("No Records"));
+//           }
+//           var data = snapshot.data!.docs;
+//           return ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: data.length,
+//             itemBuilder: (context, index) {
+//               var expensedata = data[index];
+//               return displayrecords(
+//                 data: expensedata,
+//                 onSelect: () {
+//                   print("tapped");
+//                   showDialog(
+//                     context: context,
+//                     builder: (BuildContext context) {
+//                       return AlertDialog(
+//                         content: Container(
+//                           width: 300,
+//                           height: 200,
+//                           child: Column(
+//                             mainAxisSize: MainAxisSize.max,
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                             children: [
+//                               //DIALOG TITLE HERE
+//                               Row(
+//                                 children: [
+//                                   Container(
+//                                     height: 40,
+//                                     alignment: Alignment(0, 0),
+//                                     child: const Text(
+//                                       'You tapped an item!',
+//                                       style: TextStyle(
+//                                         fontFamily: 'Ubuntu',
+//                                         fontSize: 22,
+//                                         fontWeight: FontWeight.bold,
+//                                         color: Color(0xFF001F3F),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   IconButton(
+//                                     icon: const Icon(Icons.close_rounded),
+//                                     color: Colors.black,
+//                                     iconSize: 18,
+//                                     onPressed: () {
+//                                       print('IconButton pressed ...');
+//                                       Navigator.of(context).pop();
+//                                     },
+//                                   ),
+//                                 ],
+//                               ),
+//                               //END OF DIALOG TITLE
+//                               const Divider(
+//                                 color: Colors.black87,
+//                                 thickness: 1.5,
+//                               ),
+//                               const SizedBox(height: 10),
+//                               //TEXT BODY DIALOG
+//                               Container(
+//                                 height: 30,
+//                                 child: const Center(
+//                                   child: Text(
+//                                     'Would you like to:',
+//                                     style: TextStyle(
+//                                       fontFamily: 'Ubuntu',
+//                                       fontSize: 20,
+//                                       fontWeight: FontWeight.bold,
+//                                       color: Colors.black87,
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ),
+//                               //END OF TEXT BODY DIALOG
+//                               const SizedBox(height: 30),
+//                               //ADD & CANCEL BUTTON HERE
+//                               Row(
+//                                 mainAxisAlignment:
+//                                     MainAxisAlignment.spaceBetween,
+//                                 children: [
+//                                   Container(
+//                                     width: 115,
+//                                     height: 40,
+//                                     decoration: BoxDecoration(
+//                                       borderRadius: BorderRadius.circular(100),
+//                                       color: Color(0xFFFF5963),
+//                                       boxShadow: const [
+//                                         BoxShadow(
+//                                           color: Color(0xFF33000000),
+//                                           offset: Offset(0, 2),
+//                                           blurRadius: 0,
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                     child: ElevatedButton(
+//                                       onPressed: () {
+//                                         // Implement logic to delete the item
+//                                         print("Delete");
 
-class Allexpenses extends StatelessWidget {
-  Allexpenses({
-    super.key,
-  });
+//                                         Navigator.of(context).pop();
+//                                         showDialog(
+//                                           context: context,
+//                                           builder: (BuildContext context) {
+//                                             return AlertDialog(
+//                                               content: Container(
+//                                                 width: 300,
+//                                                 height: 200,
+//                                                 child: Column(
+//                                                   mainAxisSize:
+//                                                       MainAxisSize.max,
+//                                                   crossAxisAlignment:
+//                                                       CrossAxisAlignment.start,
+//                                                   mainAxisAlignment:
+//                                                       MainAxisAlignment
+//                                                           .spaceEvenly,
+//                                                   children: [
+//                                                     //DIALOG TITLE HERE
+//                                                     Row(
+//                                                       children: [
+//                                                         Container(
+//                                                           height: 40,
+//                                                           child: const Text(
+//                                                             'Delete item',
+//                                                             style: TextStyle(
+//                                                               fontFamily:
+//                                                                   'Ubuntu',
+//                                                               fontSize: 26,
+//                                                               fontWeight:
+//                                                                   FontWeight
+//                                                                       .bold,
+//                                                               color: Color(
+//                                                                   0xFF001F3F),
+//                                                             ),
+//                                                           ),
+//                                                         ),
+//                                                       ],
+//                                                     ),
+//                                                     //END OF DIALOG TITLE
+//                                                     const Divider(
+//                                                       color: Colors.black87,
+//                                                       thickness: 1.5,
+//                                                     ),
+//                                                     const SizedBox(height: 10),
+//                                                     //TEXT BODY DIALOG
+//                                                     Container(
+//                                                       height: 50,
+//                                                       child: const Center(
+//                                                         child: Text(
+//                                                           'Do you want to delete this item?',
+//                                                           style: TextStyle(
+//                                                             fontFamily:
+//                                                                 'Ubuntu',
+//                                                             fontSize: 20,
+//                                                             fontWeight:
+//                                                                 FontWeight.bold,
+//                                                             color:
+//                                                                 Colors.black87,
+//                                                           ),
+//                                                         ),
+//                                                       ),
+//                                                     ),
+//                                                     //END OF TEXT BODY DIALOG
+//                                                     const SizedBox(height: 30),
+
+//                                                     //DELETE & CANCEL BUTTON HERE
+//                                                     Row(
+//                                                       mainAxisAlignment:
+//                                                           MainAxisAlignment
+//                                                               .spaceBetween,
+//                                                       children: [
+//                                                         Container(
+//                                                           width: 115,
+//                                                           height: 40,
+//                                                           decoration:
+//                                                               BoxDecoration(
+//                                                             borderRadius:
+//                                                                 BorderRadius
+//                                                                     .circular(
+//                                                                         100),
+//                                                             color: Colors.white,
+//                                                             boxShadow: const [
+//                                                               BoxShadow(
+//                                                                 color: Color(
+//                                                                     0xFF33000000),
+//                                                                 offset: Offset(
+//                                                                     0, 2),
+//                                                                 blurRadius: 0,
+//                                                               ),
+//                                                             ],
+//                                                           ),
+//                                                           child: ElevatedButton(
+//                                                             onPressed: () {
+//                                                               Navigator.of(
+//                                                                       context)
+//                                                                   .pop();
+//                                                             },
+//                                                             style:
+//                                                                 ElevatedButton
+//                                                                     .styleFrom(
+//                                                               backgroundColor:
+//                                                                   Colors
+//                                                                       .transparent,
+//                                                               elevation: 0,
+//                                                               shape:
+//                                                                   RoundedRectangleBorder(
+//                                                                 borderRadius:
+//                                                                     BorderRadius
+//                                                                         .circular(
+//                                                                             100),
+//                                                               ),
+//                                                             ),
+//                                                             child: const Text(
+//                                                               'Cancel',
+//                                                               style: TextStyle(
+//                                                                 fontFamily:
+//                                                                     'Ubuntu',
+//                                                                 color: Color(
+//                                                                     0xFF23cc71),
+//                                                                 fontSize: 18,
+//                                                                 fontWeight:
+//                                                                     FontWeight
+//                                                                         .w600,
+//                                                               ),
+//                                                             ),
+//                                                           ),
+//                                                         ),
+//                                                         Container(
+//                                                           width: 115,
+//                                                           height: 40,
+//                                                           decoration:
+//                                                               BoxDecoration(
+//                                                             borderRadius:
+//                                                                 BorderRadius
+//                                                                     .circular(
+//                                                                         100),
+//                                                             color: const Color(
+//                                                                 0xFFFF5963),
+//                                                             boxShadow: const [
+//                                                               BoxShadow(
+//                                                                 color: Color(
+//                                                                     0xFF33000000),
+//                                                                 offset: Offset(
+//                                                                     0, 2),
+//                                                                 blurRadius: 0,
+//                                                               ),
+//                                                             ],
+//                                                           ),
+//                                                           child: ElevatedButton(
+//                                                             onPressed:
+//                                                                 () async {
+//                                                               Navigator.of(
+//                                                                       context)
+//                                                                   .pop();
+//                                                               // Perform delete operation on tap of Delete button
+//                                                               // Use data['id'] or any unique identifier to delete the item
+//                                                               await FirebaseFirestore
+//                                                                   .instance
+//                                                                   .collection(
+//                                                                       'Users')
+//                                                                   .doc(userid)
+//                                                                   .collection(
+//                                                                       "expenses")
+//                                                                   .doc(
+//                                                                       expensedata[
+//                                                                           'id'])
+//                                                                   .delete();
+
+//                                                               print(
+//                                                                   "Deleteddddddddd"); // Close dialog
+//                                                             },
+//                                                             style:
+//                                                                 ElevatedButton
+//                                                                     .styleFrom(
+//                                                               backgroundColor:
+//                                                                   Colors
+//                                                                       .transparent,
+//                                                               elevation: 0,
+//                                                               shape:
+//                                                                   RoundedRectangleBorder(
+//                                                                 borderRadius:
+//                                                                     BorderRadius
+//                                                                         .circular(
+//                                                                             100),
+//                                                               ),
+//                                                             ),
+//                                                             child: const Text(
+//                                                               'Delete',
+//                                                               style: TextStyle(
+//                                                                 color: Color(
+//                                                                     0xFFFFFFFF),
+//                                                                 fontFamily:
+//                                                                     'Ubuntu',
+//                                                                 fontSize: 18,
+//                                                                 fontWeight:
+//                                                                     FontWeight
+//                                                                         .w600,
+//                                                               ),
+//                                                             ),
+//                                                           ),
+//                                                         ),
+//                                                       ],
+//                                                     ),
+//                                                     const SizedBox(height: 5),
+//                                                     //END OF DELETE & CANCEL BUTTOM
+//                                                   ],
+//                                                 ),
+//                                               ),
+//                                             );
+//                                           },
+//                                         );
+//                                       },
+//                                       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                       style: ElevatedButton.styleFrom(
+//                                         backgroundColor: Colors.transparent,
+//                                         elevation: 0,
+//                                         shape: RoundedRectangleBorder(
+//                                           borderRadius:
+//                                               BorderRadius.circular(100),
+//                                         ),
+//                                       ),
+//                                       child: const Text(
+//                                         'Delete',
+//                                         style: TextStyle(
+//                                           color: Color(0xFFFFFFFF),
+//                                           fontFamily: 'Ubuntu',
+//                                           fontSize: 18,
+//                                           fontWeight: FontWeight.w600,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   Container(
+//                                     width: 115,
+//                                     height: 40,
+//                                     decoration: BoxDecoration(
+//                                       borderRadius: BorderRadius.circular(100),
+//                                       color: const Color(0xFF23cc71),
+//                                       boxShadow: const [
+//                                         BoxShadow(
+//                                           color: Color(0xFF33000000),
+//                                           offset: Offset(0, 2),
+//                                           blurRadius: 0,
+//                                         ),
+//                                       ],
+//                                     ),
+//                                     child: ElevatedButton(
+//                                       onPressed: () {
+//                                         print("updateee");
+//                                         Navigator.of(context).pop();
+//                                         up.openNoteBox(context, expensedata);
+//                                       },
+//                                       style: ElevatedButton.styleFrom(
+//                                         backgroundColor: Colors.transparent,
+//                                         elevation: 0,
+//                                         shape: RoundedRectangleBorder(
+//                                           borderRadius:
+//                                               BorderRadius.circular(100),
+//                                         ),
+//                                       ),
+//                                       child: const Text(
+//                                         'Update',
+//                                         style: TextStyle(
+//                                           color: Colors.white,
+//                                           fontFamily: 'Ubuntu',
+//                                           fontSize: 20,
+//                                           fontWeight: FontWeight.w700,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                               const SizedBox(height: 5),
+//                               //END OF ADD & CANCEL BUTTON
+//                             ],
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   );
+//                   // showDialog(
+//                   //   context: context,
+//                   //   builder: (BuildContext context) {
+//                   //     return AlertDialog(
+//                   //       title: Text('Update or Delete?'),
+//                   //       content: Text('You tapped an item!'),
+//                   //       actions: <Widget>[
+//                   //         TextButton(
+//                   //           onPressed: () {
+//                   //             // Implement logic to update the item
+
+//                   //             Navigator.of(context).pop();
+//                   //           },
+//                   //           child: Text('Cancel'),
+//                   //         ),
+//                   //         TextButton(
+//                   //           onPressed: () {
+//                   //             // Implement logic to update the item
+//                   //             print("updateee");
+//                   //             Navigator.of(context).pop();
+//                   //             up.openNoteBox(context, expensedata);
+//                   //           },
+//                   //           child: Text('Update'),
+//                   //         ),
+//                   //         TextButton(
+//                   //           onPressed: () {
+//                   //             // Implement logic to delete the item
+//                   //             print("Delete");
+
+//                   //             Navigator.of(context).pop();
+//                   //             showDialog(
+//                   //               context: context,
+//                   //               builder: (BuildContext context) {
+//                   //                 return AlertDialog(
+//                   //                   title: const Text('Delete Item'),
+//                   //                   content: const Text(
+//                   //                       'Do you want to delete this item?'),
+//                   //                   actions: <Widget>[
+//                   //                     TextButton(
+//                   //                       onPressed: () {
+//                   //                         Navigator.of(context)
+//                   //                             .pop(); // Close dialog
+//                   //                       },
+//                   //                       child: Text('Cancel'),
+//                   //                     ),
+//                   //                     TextButton(
+//                   //                       onPressed: () async {
+//                   //                         // Perform delete operation on tap of Delete button
+//                   //                         // Use data['id'] or any unique identifier to delete the item
+//                   //                         await FirebaseFirestore.instance
+//                   //                             .collection('Users')
+//                   //                             .doc(userid)
+//                   //                             .collection("expenses")
+//                   //                             .doc(expensedata['id'])
+//                   //                             .delete();
+
+//                   //                         Navigator.of(context).pop();
+//                   //                         print(
+//                   //                             "Deleteddddddddd"); // Close dialog
+//                   //                       },
+//                   //                       child: Text('Delete'),
+//                   //                     ),
+//                   //                   ],
+//                   //                 );
+//                   //               },
+//                   //             );
+//                   //           },
+//                   //           child: Text('Delete'),
+//                   //         ),
+//                   //       ],
+//                   //     );
+//                   //   },
+//                   // );
+//                   // Implement deletion logic here
+//                   // For example, use data['id'] to delete the corresponding item from Firestore
+//                   // FirebaseFirestore.instance.collection('your_collection_path').doc(data['id']).delete();
+//                 },
+//               );
+//             },
+//           );
+//         });
+//   }
+// }
+
+class BudgetExpenses extends StatelessWidget {
+  final String? id;
+  BudgetExpenses({super.key, required this.id});
+
   final userid = FirebaseAuth.instance.currentUser!.uid;
   Update up = Update();
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
+    // print('THE SELECTED is $id');
+
+    // Determine the query based on whether id is null or not
+
+    final query = (id == 'null' || id == null)
+        ? FirebaseFirestore.instance
             .collection('Users')
             .doc(userid)
             .collection('expenses')
             .orderBy("timestamp", descending: false)
-            .snapshots(),
+        : (id == '0')
+            ? FirebaseFirestore.instance
+                .collection('Users')
+                .doc(userid)
+                .collection('expenses')
+                .where('budget_id',
+                    isEqualTo:
+                        'No available id') // Modify as per your requirement
+                .orderBy("timestamp", descending: true)
+            : FirebaseFirestore.instance
+                .collection('Users')
+                .doc(userid)
+                .collection('expenses')
+                .where('budget_id', isEqualTo: id)
+                .orderBy("timestamp", descending: true);
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: query.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));
@@ -1228,471 +1933,16 @@ class Allexpenses extends StatelessWidget {
             return const Center(child: Text("No Records"));
           }
 
-          // return ListView(
-          //   children: snapshot.data!.docs.map((DocumentSnapshot document) {
-          //   Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-          //     return ListTile(
-          //       title: Text(data['full_name']),
-          //       subtitle: Text(data['company']),
-          //     );
-          //   }).toList(),
-          // );
           var data = snapshot.data!.docs;
           return ListView.builder(
             shrinkWrap: true,
             itemCount: data.length,
-            // /physics: NeverScrollableScrollPhysics(),
-            //   itemCount: yourItemList.length, // Replace with your actual item list length
             itemBuilder: (context, index) {
               var expensedata = data[index];
               return displayrecords(
                 data: expensedata,
                 onSelect: () {
-                  print("tapped");
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        content: Container(
-                          width: 300,
-                          height: 200,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              //DIALOG TITLE HERE
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    alignment: Alignment(0, 0),
-                                    child: const Text(
-                                      'You tapped an item!',
-                                      style: TextStyle(
-                                        fontFamily: 'Ubuntu',
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF001F3F),
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close_rounded),
-                                    color: Colors.black,
-                                    iconSize: 18,
-                                    onPressed: () {
-                                      print('IconButton pressed ...');
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              ),
-                              //END OF DIALOG TITLE
-                              const Divider(
-                                color: Colors.black87,
-                                thickness: 1.5,
-                              ),
-                              const SizedBox(height: 10),
-                              //TEXT BODY DIALOG
-                              Container(
-                                height: 30,
-                                child: const Center(
-                                  child: Text(
-                                    'Would you like to:',
-                                    style: TextStyle(
-                                      fontFamily: 'Ubuntu',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              //END OF TEXT BODY DIALOG
-                              const SizedBox(height: 30),
-                              //ADD & CANCEL BUTTON HERE
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: 115,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      color: Color(0xFFFF5963),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0xFF33000000),
-                                          offset: Offset(0, 2),
-                                          blurRadius: 0,
-                                        ),
-                                      ],
-                                    ),
-                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        // Implement logic to delete the item
-                                        print("Delete");
-
-                                        Navigator.of(context).pop();
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              content: Container(
-                                                width: 300,
-                                                height: 200,
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    //DIALOG TITLE HERE
-                                                    Row(
-                                                      children: [
-                                                        Container(
-                                                          height: 40,
-                                                          child: const Text(
-                                                            'Delete item',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  'Ubuntu',
-                                                              fontSize: 26,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: Color(
-                                                                  0xFF001F3F),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    //END OF DIALOG TITLE
-                                                    const Divider(
-                                                      color: Colors.black87,
-                                                      thickness: 1.5,
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    //TEXT BODY DIALOG
-                                                    Container(
-                                                      height: 50,
-                                                      child: const Center(
-                                                        child: Text(
-                                                          'Do you want to delete this item?',
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Ubuntu',
-                                                            fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                Colors.black87,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    //END OF TEXT BODY DIALOG
-                                                    const SizedBox(height: 30),
-
-                                                    //DELETE & CANCEL BUTTON HERE
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Container(
-                                                          width: 115,
-                                                          height: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100),
-                                                            color: Colors.white,
-                                                            boxShadow: const [
-                                                              BoxShadow(
-                                                                color: Color(
-                                                                    0xFF33000000),
-                                                                offset: Offset(
-                                                                    0, 2),
-                                                                blurRadius: 0,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              elevation: 0,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            100),
-                                                              ),
-                                                            ),
-                                                            child: const Text(
-                                                              'Cancel',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Ubuntu',
-                                                                color: Color(
-                                                                    0xFF23cc71),
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          width: 115,
-                                                          height: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100),
-                                                            color: const Color(
-                                                                0xFFFF5963),
-                                                            boxShadow: const [
-                                                              BoxShadow(
-                                                                color: Color(
-                                                                    0xFF33000000),
-                                                                offset: Offset(
-                                                                    0, 2),
-                                                                blurRadius: 0,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              // Perform delete operation on tap of Delete button
-                                                              // Use data['id'] or any unique identifier to delete the item
-                                                              await FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                      'Users')
-                                                                  .doc(userid)
-                                                                  .collection(
-                                                                      "expenses")
-                                                                  .doc(
-                                                                      expensedata[
-                                                                          'id'])
-                                                                  .delete();
-
-                                                              print(
-                                                                  "Deleteddddddddd"); // Close dialog
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              elevation: 0,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            100),
-                                                              ),
-                                                            ),
-                                                            child: const Text(
-                                                              'Delete',
-                                                              style: TextStyle(
-                                                                color: Color(
-                                                                    0xFFFFFFFF),
-                                                                fontFamily:
-                                                                    'Ubuntu',
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    //END OF DELETE & CANCEL BUTTOM
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(
-                                          color: Color(0xFFFFFFFF),
-                                          fontFamily: 'Ubuntu',
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 115,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      color: const Color(0xFF23cc71),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0xFF33000000),
-                                          offset: Offset(0, 2),
-                                          blurRadius: 0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        print("updateee");
-                                        Navigator.of(context).pop();
-                                        up.openNoteBox(context, expensedata);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Update',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'Ubuntu',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              //END OF ADD & CANCEL BUTTON
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                  // showDialog(
-                  //   context: context,
-                  //   builder: (BuildContext context) {
-                  //     return AlertDialog(
-                  //       title: Text('Update or Delete?'),
-                  //       content: Text('You tapped an item!'),
-                  //       actions: <Widget>[
-                  //         TextButton(
-                  //           onPressed: () {
-                  //             // Implement logic to update the item
-
-                  //             Navigator.of(context).pop();
-                  //           },
-                  //           child: Text('Cancel'),
-                  //         ),
-                  //         TextButton(
-                  //           onPressed: () {
-                  //             // Implement logic to update the item
-                  //             print("updateee");
-                  //             Navigator.of(context).pop();
-                  //             up.openNoteBox(context, expensedata);
-                  //           },
-                  //           child: Text('Update'),
-                  //         ),
-                  //         TextButton(
-                  //           onPressed: () {
-                  //             // Implement logic to delete the item
-                  //             print("Delete");
-
-                  //             Navigator.of(context).pop();
-                  //             showDialog(
-                  //               context: context,
-                  //               builder: (BuildContext context) {
-                  //                 return AlertDialog(
-                  //                   title: const Text('Delete Item'),
-                  //                   content: const Text(
-                  //                       'Do you want to delete this item?'),
-                  //                   actions: <Widget>[
-                  //                     TextButton(
-                  //                       onPressed: () {
-                  //                         Navigator.of(context)
-                  //                             .pop(); // Close dialog
-                  //                       },
-                  //                       child: Text('Cancel'),
-                  //                     ),
-                  //                     TextButton(
-                  //                       onPressed: () async {
-                  //                         // Perform delete operation on tap of Delete button
-                  //                         // Use data['id'] or any unique identifier to delete the item
-                  //                         await FirebaseFirestore.instance
-                  //                             .collection('Users')
-                  //                             .doc(userid)
-                  //                             .collection("expenses")
-                  //                             .doc(expensedata['id'])
-                  //                             .delete();
-
-                  //                         Navigator.of(context).pop();
-                  //                         print(
-                  //                             "Deleteddddddddd"); // Close dialog
-                  //                       },
-                  //                       child: Text('Delete'),
-                  //                     ),
-                  //                   ],
-                  //                 );
-                  //               },
-                  //             );
-                  //           },
-                  //           child: Text('Delete'),
-                  //         ),
-                  //       ],
-                  //     );
-                  //   },
-                  // );
-                  // Implement deletion logic here
-                  // For example, use data['id'] to delete the corresponding item from Firestore
-                  // FirebaseFirestore.instance.collection('your_collection_path').doc(data['id']).delete();
+                  // print("tapped");
                 },
               );
             },

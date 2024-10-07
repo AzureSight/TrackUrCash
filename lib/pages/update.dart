@@ -26,7 +26,7 @@ class Update {
     // DateTime date = DateTime.now();
     // var id = uid.v4();
     // String monthyear = DateFormat("MMM y").format(date);
-    print(_expensedetailController.text.toString());
+    // print(_expensedetailController.text.toString());
 
     await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
 
@@ -34,6 +34,7 @@ class Update {
       "id": expensedata['id'],
       "detail": detail,
       "budget": expensedata['budget'],
+      "budget_id": expensedata['budget_id'],
       "amount": Amount,
       "timestamp": expensedata['timestamp'],
       "monthyear": expensedata['monthyear'],
@@ -45,17 +46,23 @@ class Update {
         .doc(expensedata['id'])
         .set(data);
 
-    // Budget bud = Budget();
-    // bud.refreshPage();
-    // Budget.globalKey.currentState?.refreshPage();
+    // if (Budget.globalKey.currentState != null) {
+    //   Budget.globalKey.currentState?.refreshPage();
+    //   _expensedetailController.clear();
+    //   _amountController.clear();
+    //   _dateController.clear();
+    //   Navigator.pop(context);
+    // } else {
+    //   print("The Budget widget is not available (currentState is null).");
+    // }
+    // Clear form data
+    _expensedetailController.clear();
+    _amountController.clear();
+    _dateController.clear();
+    Navigator.pop(context);
+    // Optionally refresh the Budget page if a callback is provided
     if (Budget.globalKey.currentState != null) {
       Budget.globalKey.currentState?.refreshPage();
-      _expensedetailController.clear();
-      _amountController.clear();
-      _dateController.clear();
-      Navigator.pop(context);
-    } else {
-      print("The Budget widget is not available (currentState is null).");
     }
   }
 
@@ -99,7 +106,7 @@ class Update {
           key: _keyform,
           child: Container(
             width: 350,
-            height: 240,
+            height: 264,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,

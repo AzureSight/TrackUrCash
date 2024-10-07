@@ -537,7 +537,7 @@ class _DashboardState extends State<Dashboard> {
                         Container(
                           color: const Color.fromARGB(255, 255, 255, 255),
                           height:
-                              400, // Replace with an appropriate fixed height
+                              320, // Replace with an appropriate fixed height
                           child: TodaytransactionsDashboard(),
                         ),
                       ],

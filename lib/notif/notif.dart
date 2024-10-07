@@ -98,7 +98,7 @@ class NotificationService {
         priority: Priority.high,
         playSound: true,
         styleInformation: BigTextStyleInformation(
-          'Stayss on top of your finances by logging your expenses today. Every small step counts! Take control with a quick update now!',
+          'Be the king of your finances by logging your expenses today. Every small step counts! Take control with a quick update now!',
           contentTitle: 'Time to Track Your Expenses!',
           htmlFormatContent: true,
           htmlFormatContentTitle: true,
@@ -249,7 +249,8 @@ class NotificationService {
       title: 'Time to Track Your Expenses!',
       body:
           "Stay on top of your finances by logging your expenses today. Every small step counts!",
-      duration: const Duration(minutes: 5),
+      // duration: const Duration(minutes: 5),
+      duration: const Duration(hours: 2),
     );
   }
 
@@ -270,7 +271,7 @@ class NotificationService {
   tz.TZDateTime _nextInstanceOfTenAM() {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime scheduledDate =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, 02, 30);
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, 11);
 
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));

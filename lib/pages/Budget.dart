@@ -96,7 +96,7 @@ class _BudgetState extends State<Budget> {
       builder: (context) => AlertDialog(
         content: Container(
           width: 500,
-          height: 250,
+          height: 259,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +373,7 @@ class _BudgetState extends State<Budget> {
       builder: (context) => AlertDialog(
         content: Container(
           width: 500,
-          height: 250,
+          height: 259,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -895,7 +895,7 @@ class _BudgetState extends State<Budget> {
             .collection('Users')
             .doc(user.uid)
             .collection('expenses')
-            // .where('budget', isNotEqualTo: 'testing ')
+            // .where('budget', isNotEqualTo: 'asd')
             .get();
 
         WriteBatch batch2 = FirebaseFirestore.instance.batch();
@@ -904,16 +904,27 @@ class _BudgetState extends State<Budget> {
 
           // String cleanedBudgetDesc = expenseBudgetDesc.replaceAll(' + - ', '');
 
-          if (expenseBudgetDesc.length > 12) {
-            // Remove the last 12 characters from the budget description
+          // if (expenseBudgetDesc.length > 12) {
+          //   // Remove the last 12 characters from the budget description
+          //   expenseBudgetDesc =
+          //       expenseBudgetDesc.substring(0, expenseBudgetDesc.length - 12);
+          // }
+
+          // batch2.update(
+          //     doc.reference, {'budget': '$expenseBudgetDesc - completed'});
+          // // doc.reference,
+          // // {
+          // //   'budget': expenseBudgetDesc,
+          // //   // 'budget_id': null, // gigamit para lang sa kulang na field if nagupdate sa database
+          // // });
+
+          if (expenseBudgetDesc.endsWith(' - completed')) {
             expenseBudgetDesc =
                 expenseBudgetDesc.substring(0, expenseBudgetDesc.length - 12);
           }
 
           batch2.update(
               doc.reference, {'budget': '$expenseBudgetDesc - completed'});
-          // doc.reference,
-          // {'budget': expenseBudgetDesc});
         }
         await batch2.commit();
         getbudget();
@@ -935,7 +946,7 @@ class _BudgetState extends State<Budget> {
   Future<void> initialize() async {
     await getbudget();
     await fetchexpenses();
-    await fetchBudgetOptions();
+    // await fetchBudgetOptions();
     NotificationService().schedulenotify();
     // NotificationService().scheduleMyNotification();
   }
@@ -978,11 +989,16 @@ class _BudgetState extends State<Budget> {
       "Awesome work! You also saved {savings} pesos. Keep it up!",
       "You're doing fantastic! You've managed to save {savings} pesos. Save it for something bigger!"
     ];
+    List<String> equaltobudget = [
+      "You haven't saved a penny. Try to save next time!",
+      "Awesome work! you are within your budget!",
+      "Keep it up!"
+    ];
 
     List<String> exceedBudgetMessages = [
       "Uh-oh! Your expenses have exceeded your budget.",
       "Looks like you're over your budget.",
-      "Your current expenses are over your budget limit. Don’t worry!"
+      "Your current expenses are over your budget limit. Save More!"
     ];
 
     // Function to get a random message
@@ -995,8 +1011,10 @@ class _BudgetState extends State<Budget> {
 
     // Determine which list of messages to use
     String message;
-    if (roundedRemaining >= 0) {
+    if (roundedRemaining > 0) {
       message = getRandomMessage(withinBudgetMessages, remaining);
+    } else if (roundedRemaining == 0) {
+      message = getRandomMessage(equaltobudget, remaining);
     } else {
       message = getRandomMessage(exceedBudgetMessages, remaining);
     }
@@ -1093,7 +1111,164 @@ class _BudgetState extends State<Budget> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(45, 0, 45, 0),
                               child: ElevatedButton(
-                                onPressed: openNoteBox,
+                                onPressed: () {
+                                  if (budgetdesc == "") {
+                                    openNoteBox();
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          content: SizedBox(
+                                            width: 300,
+                                            height: 201,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                //DIALOG TITLE HERE
+
+                                                const SizedBox(
+                                                  height: 40,
+                                                  child: Center(
+                                                    child: Text(
+                                                      'Set Budget?',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Ubuntu',
+                                                        fontSize: 26,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF001F3F),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                const SizedBox(
+                                                  height: 30,
+                                                  child: Center(
+                                                    child: Text(
+                                                      'You have an active budget!',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Ubuntu',
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Color.fromARGB(
+                                                            221, 255, 0, 0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //END OF DIALOG TITLE
+                                                const Divider(
+                                                  color: Colors.black87,
+                                                  thickness: 1,
+                                                ),
+
+                                                const SizedBox(
+                                                  height: 50,
+                                                  child: Center(
+                                                    child: Text(
+                                                      'Complete active budget first before setting a new one.',
+                                                      textAlign: TextAlign
+                                                          .center, // Align text to the center
+                                                      style: TextStyle(
+                                                        fontFamily: 'Ubuntu',
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                //END OF TEXT BODY DIALOG
+                                                const SizedBox(height: 10),
+
+                                                //DELETE & CANCEL BUTTON HERE
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: 115,
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.white,
+                                                        boxShadow: const [
+                                                          BoxShadow(
+                                                            color: Color(
+                                                                0xFF33000000),
+                                                            offset:
+                                                                Offset(0, 2),
+                                                            blurRadius: 0,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              const Color
+                                                                  .fromARGB(255,
+                                                                  1, 162, 255),
+                                                          elevation: 0,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                          ),
+                                                        ),
+                                                        child: const Text(
+                                                          'Ok',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Ubuntu',
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    221,
+                                                                    255,
+                                                                    255,
+                                                                    255),
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 5),
+                                                //END OF DELETE & CANCEL BUTTOM
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
+                                }
+                                // openNoteBox,
+
+                                ,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF23CC71),
                                   elevation: 10,
@@ -1130,7 +1305,7 @@ class _BudgetState extends State<Budget> {
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 15),
               child: Container(
                 width: 390,
-                height: 600,
+                height: 630,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -1180,46 +1355,46 @@ class _BudgetState extends State<Budget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Padding(
-                                //   padding:
-                                //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                //   child: Text(
-                                //     budgetdesc, // Make sure 'budgetdesc' is a valid variable
-                                //     style: const TextStyle(
-                                //       fontFamily: 'Manrope',
-                                //       color: Color(0xFF2E2863),
-                                //       fontSize: 16,
-                                //       fontWeight: FontWeight.bold,
-                                //     ),
-                                //   ),
-                                // ),
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                  child: DropdownButton<String>(
-                                    // Display the selected value or hint if none is selected
-                                    value: selectedBudget,
-                                    hint:
-                                        const Text("Select Budget Description"),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        print(newValue);
-                                        selectedBudget =
-                                            newValue; // Update the selected value
-                                        // budgetdesc = newValue ??
-                                        //     ""; // Update the budgetdesc
-                                      });
-                                    },
-                                    items: budgetOptions
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                  child: Text(
+                                    budgetdesc, // Make sure 'budgetdesc' is a valid variable
+                                    style: const TextStyle(
+                                      fontFamily: 'Manrope',
+                                      color: Color(0xFF2E2863),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
+                                // Padding(
+                                //   padding:
+                                //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                //   child: DropdownButton<String>(
+                                //     // Display the selected value or hint if none is selected
+                                //     value: selectedBudget,
+                                //     hint:
+                                //         const Text("Select Budget Description"),
+                                //     onChanged: (String? newValue) {
+                                //       setState(() {
+                                //         print(newValue);
+                                //         selectedBudget =
+                                //             newValue; // Update the selected value
+                                //         // budgetdesc = newValue ??
+                                //         //     ""; // Update the budgetdesc
+                                //       });
+                                //     },
+                                //     items: budgetOptions
+                                //         .map<DropdownMenuItem<String>>(
+                                //             (String value) {
+                                //       return DropdownMenuItem<String>(
+                                //         value: value,
+                                //         child: Text(value),
+                                //       );
+                                //     }).toList(),
+                                //   ),
+                                // ),
                                 Text(
                                   // '₱$budget', // Ensure 'tot' is passed to the widget
                                   formattedbudget,
@@ -1463,7 +1638,357 @@ class _BudgetState extends State<Budget> {
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    openReminderBox(context);
+                                    // openReminderBox(context);
+                                    if (budgetdesc == "") {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            content: SizedBox(
+                                              width: 300,
+                                              height: 201,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  //DIALOG TITLE HERE
+
+                                                  const SizedBox(
+                                                    height: 40,
+                                                    child: Center(
+                                                      child: Text(
+                                                        'No Active Budget!',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontFamily: 'Ubuntu',
+                                                          fontSize: 26,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Color(0xFF001F3F),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  const SizedBox(
+                                                    height: 30,
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Set Budget First!',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Ubuntu',
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Color.fromARGB(
+                                                              221, 255, 0, 0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  //END OF DIALOG TITLE
+                                                  const Divider(
+                                                    color: Colors.black87,
+                                                    thickness: 1,
+                                                  ),
+
+                                                  const SizedBox(
+                                                    height: 50,
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Setting a budget can help you save more.',
+                                                        textAlign: TextAlign
+                                                            .center, // Align text to the center
+                                                        style: TextStyle(
+                                                          fontFamily: 'Ubuntu',
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  //END OF TEXT BODY DIALOG
+                                                  const SizedBox(height: 10),
+
+                                                  //DELETE & CANCEL BUTTON HERE
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                        width: 115,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          color: Colors.white,
+                                                          boxShadow: const [
+                                                            BoxShadow(
+                                                              color: Color(
+                                                                  0xFF33000000),
+                                                              offset:
+                                                                  Offset(0, 2),
+                                                              blurRadius: 0,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    1,
+                                                                    162,
+                                                                    255),
+                                                            elevation: 0,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          100),
+                                                            ),
+                                                          ),
+                                                          child: const Text(
+                                                            'Ok',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'Ubuntu',
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      221,
+                                                                      255,
+                                                                      255,
+                                                                      255),
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  //END OF DELETE & CANCEL BUTTOM
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            content: SizedBox(
+                                              width: 300,
+                                              height: 200,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  //DIALOG TITLE HERE
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 40,
+                                                        child: const Text(
+                                                          'Complete Budget?',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Ubuntu',
+                                                            fontSize: 26,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Color(
+                                                                0xFF001F3F),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  //END OF DIALOG TITLE
+                                                  const Divider(
+                                                    color: Colors.black87,
+                                                    thickness: 1.5,
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  //TEXT BODY DIALOG
+                                                  Container(
+                                                    height: 50,
+                                                    child: const Center(
+                                                      child: Text(
+                                                        'Do you want to complete this budget?',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Ubuntu',
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  //END OF TEXT BODY DIALOG
+                                                  const SizedBox(height: 30),
+
+                                                  //DELETE & CANCEL BUTTON HERE
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        width: 115,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          color: Colors.white,
+                                                          boxShadow: const [
+                                                            BoxShadow(
+                                                              color: Color(
+                                                                  0xFF33000000),
+                                                              offset:
+                                                                  Offset(0, 2),
+                                                              blurRadius: 0,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            elevation: 0,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          100),
+                                                            ),
+                                                          ),
+                                                          child: const Text(
+                                                            'Cancel',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'Ubuntu',
+                                                              color: Colors
+                                                                  .black87,
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 130,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          color: const Color(
+                                                              0xFF23CC71),
+                                                          boxShadow: const [
+                                                            BoxShadow(
+                                                              color: Color(
+                                                                  0xFF33000000),
+                                                              offset:
+                                                                  Offset(0, 2),
+                                                              blurRadius: 0,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            openReminderBox(
+                                                                context);
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            elevation: 0,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          100),
+                                                            ),
+                                                          ),
+                                                          child: const Text(
+                                                            'Complete',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFFFFFFFF),
+                                                              fontFamily:
+                                                                  'Ubuntu',
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  //END OF DELETE & CANCEL BUTTOM
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF23CC71),

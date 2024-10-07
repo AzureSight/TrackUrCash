@@ -324,7 +324,11 @@ class Transactions_Budget extends StatelessWidget {
                                                                   .delete();
 
                                                               print(
-                                                                  "Deleteddddddddd"); // Close dialog
+                                                                  "Deleteddddddddd");
+
+                                                              Budget.globalKey
+                                                                  .currentState
+                                                                  ?.refreshPage(); // Close dialog
                                                             },
                                                             style:
                                                                 ElevatedButton
