@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/pages/Budget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,7 @@ class Update {
   final TextEditingController _dateController = TextEditingController();
   var uid = Uuid();
 
-  Future<void> submit(expensedata) async {
+  Future<void> submit(expensedata, context) async {
     // _expensedetailController.text = expensedata['detail'];
     final User = FirebaseAuth.instance.currentUser;
     // int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -43,6 +44,19 @@ class Update {
         .collection("expenses")
         .doc(expensedata['id'])
         .set(data);
+
+    // Budget bud = Budget();
+    // bud.refreshPage();
+    // Budget.globalKey.currentState?.refreshPage();
+    if (Budget.globalKey.currentState != null) {
+      Budget.globalKey.currentState?.refreshPage();
+      _expensedetailController.clear();
+      _amountController.clear();
+      _dateController.clear();
+      Navigator.pop(context);
+    } else {
+      print("The Budget widget is not available (currentState is null).");
+    }
   }
 
   Future<double> computeTotalAmount() async {
@@ -314,14 +328,14 @@ class Update {
                           // firestoreService
                           //     .addAmount(int.parse(_amountController.text));
                           if (_keyform.currentState!.validate()) {
-                            submit(expensedata);
+                            submit(expensedata, context);
                             //CLEAR THE TEXT CONTROLLER
-                            _expensedetailController.clear();
-                            _amountController.clear();
-                            _dateController.clear();
+                            // _expensedetailController.clear();
+                            // _amountController.clear();
+                            // _dateController.clear();
 
                             //CLOSE THE BOX
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
                           }
                         },
                         style: ElevatedButton.styleFrom(

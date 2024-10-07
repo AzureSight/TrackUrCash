@@ -13,10 +13,20 @@ import 'package:uuid/uuid.dart';
 
 //import 'package:percent_indicator/linear_percent_indicator.dart';
 class Budget extends StatefulWidget {
-  const Budget({super.key});
+  // ignore: library_private_types_in_public_api
+  static final GlobalKey<_BudgetState> globalKey = GlobalKey<_BudgetState>();
+
+  // const Budget({super.key});
+  Budget({Key? key}) : super(key: globalKey); // Pass globalKey here
 
   @override
   State<Budget> createState() => _BudgetState();
+  void refreshPage() {
+    // print("IM HERE NOWWWWWWWWWWWWWWWW");
+    globalKey.currentState?.refreshPage();
+    // print("IM HERE below NOWWWWWWWWWWWWWWWW");
+    // Access the state using the global key and call refreshPage in _BudgetState
+  }
 }
 
 class _BudgetState extends State<Budget> {
@@ -28,13 +38,58 @@ class _BudgetState extends State<Budget> {
   String budgetdesc = "";
   double tot = 0.0;
   var uid = Uuid();
+
   //DIALOG BOX TO ADD EXPENSES HERE
 
-  // void refreshPage() {
-  //   setState(() {
-  //     // Update your state here to refresh the page
-  //   });
-  // }
+  void refreshPage() {
+    print("imhereFINALLY");
+    initialize();
+  }
+
+  // String? selectedBudget;
+  // List<String> budgetOptions = [
+  //   'Budget for Food',
+  //   'Budget for Travel',
+  //   'Budget for Entertainment',
+  //   'Budget for Utilities',
+  //   'Budget for Others',
+  // ]; // Add y
+  String? selectedBudget; // Holds the selected budget option
+  List<String> budgetOptions = [];
+
+  Future<void> fetchBudgetOptions() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        QuerySnapshot userDocument = await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(user.uid)
+            .collection("budget")
+            .orderBy('created_at', descending: true)
+            .limit(5)
+            .get();
+
+        // Clear existing options
+        budgetOptions.clear();
+
+        // Iterate through the documents and add budget_desc to the options list
+        for (var doc in userDocument.docs) {
+          // Assuming each document has a field named 'budget_desc'
+          String budgetDesc = doc['budget_desc'] ??
+              'No description'; // Fallback if field is null
+          budgetOptions.add(budgetDesc);
+          print(budgetDesc);
+        }
+
+        // Update the state to reflect changes in the UI
+        setState(() {});
+      } catch (e) {
+        print(
+            "Error fetching budget options: $e"); // Handle errors appropriately
+      }
+    }
+  }
+
   void openNoteBox() {
     showDialog(
       context: context,
@@ -880,6 +935,7 @@ class _BudgetState extends State<Budget> {
   Future<void> initialize() async {
     await getbudget();
     await fetchexpenses();
+    await fetchBudgetOptions();
     NotificationService().schedulenotify();
     // NotificationService().scheduleMyNotification();
   }
@@ -1124,17 +1180,44 @@ class _BudgetState extends State<Budget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                // Padding(
+                                //   padding:
+                                //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                //   child: Text(
+                                //     budgetdesc, // Make sure 'budgetdesc' is a valid variable
+                                //     style: const TextStyle(
+                                //       fontFamily: 'Manrope',
+                                //       color: Color(0xFF2E2863),
+                                //       fontSize: 16,
+                                //       fontWeight: FontWeight.bold,
+                                //     ),
+                                //   ),
+                                // ),
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                  child: Text(
-                                    budgetdesc, // Make sure 'budgetdesc' is a valid variable
-                                    style: const TextStyle(
-                                      fontFamily: 'Manrope',
-                                      color: Color(0xFF2E2863),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  child: DropdownButton<String>(
+                                    // Display the selected value or hint if none is selected
+                                    value: selectedBudget,
+                                    hint:
+                                        const Text("Select Budget Description"),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        print(newValue);
+                                        selectedBudget =
+                                            newValue; // Update the selected value
+                                        // budgetdesc = newValue ??
+                                        //     ""; // Update the budgetdesc
+                                      });
+                                    },
+                                    items: budgetOptions
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
                                   ),
                                 ),
                                 Text(

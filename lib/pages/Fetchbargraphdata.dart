@@ -130,13 +130,34 @@ class _MyBarGraphState extends State<MyBarGraph> {
         BarChartData(
             gridData: FlGridData(show: false),
             borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
+            titlesData: const FlTitlesData(
               show: true,
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: getBottomTitles,
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget:
+                      getLeftTitles, // You can define a custom widget for left titles
+                  reservedSize: 30,
+                  // Reserve space for the left titles
+                ),
+              ),
+              // leftTitles: AxisTitles(
+              //   sideTitles: SideTitles(
+              //     showTitles: true,
+              //     reservedSize: 40, // Reserve space for the left titles
+              //   ),
+              // ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: false,
+                  reservedSize: 60, // Hide right titles (optional)
                 ),
               ),
             ),
@@ -247,6 +268,45 @@ Widget getBottomTitles(double value, TitleMeta meta) {
   );
 }
 
+String getFormattedValue(double value) {
+  // Format the value similar to how fl_chart does it
+  if (value >= 1000) {
+    return '${(value / 1000).toStringAsFixed(1)}k'; // Convert to k format
+  }
+  return value.toString(); // Return as is for lower values
+}
+
+Widget getLeftTitles(double value, TitleMeta meta) {
+  return Text(
+    getFormattedValue(value), // Use the custom formatting function
+    style: const TextStyle(
+      color: Colors.black, // Set your desired text color
+      fontSize: 11, // Set the desired smaller font size
+      fontWeight: FontWeight.normal, // Keep the default font weight
+    ),
+  );
+}
+// Widget getLeftTitles(double value, TitleMeta meta) {
+//   // Customize the title based on the value
+//   String title = value.toString(); // Convert the value to a string
+//   // You can add conditions for different title formats based on the value
+//   if (value == 0) {
+//     title = "0"; // Example for value 0
+//   } else if (value > 0) {
+//     title = "${value.toInt()}K"; // Add unit for positive values
+//   } else {
+//     title = "${value.toInt()}K"; // Different label for negative values
+//   }
+
+//   return Text(
+//     title,
+//     style: const TextStyle(
+//       color: Color(0xFF23CC71), // Customize the color
+//       fontSize: 10, // Customize the font size
+//       fontWeight: FontWeight.w500, // Customize the font weight
+//     ),
+//   );
+// }
 // double mons = 0.0;
 // double tues = 0.0;
 // double weds = 0.0;
