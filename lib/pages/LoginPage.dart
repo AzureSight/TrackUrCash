@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/auth/auth_service.dart';
 import 'package:finalproject_cst9l/pages/Profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   //final  = GlobalKey<FormState>();
 
   final GlobalKey<FormState> keyform = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
+
   String email = "";
   String password = "";
   final _emailController = TextEditingController();
@@ -275,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                   //TextFormField_Email
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(8, 70, 8, 0),
-                    child: Container(
+                    child: SizedBox(
                       width: 350,
                       child: TextFormField(
                         controller: _emailController,
@@ -447,7 +450,7 @@ class _LoginPageState extends State<LoginPage> {
                   //Login Button
 
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 35, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 35, 0, 25),
                     child: ElevatedButton(
                       onPressed: () {
                         print('Button pressed ...');
@@ -458,9 +461,10 @@ class _LoginPageState extends State<LoginPage> {
                         login();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF23cc71),
-                        padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                        fixedSize: Size(300, 50),
+                        backgroundColor: const Color(0xFF23cc71),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
+                        fixedSize: const Size(300, 50),
                       ),
                       child: const Text(
                         'Sign In',
@@ -508,12 +512,15 @@ class _LoginPageState extends State<LoginPage> {
 
                   //GOOGLE AND FACEBOOK SIGN IN
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(top: 25, bottom: 8),
                     child: SizedBox(
                       height: 50,
                       width: 300,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          // await _authService.signInWithGoogle();
+                          googlelogin();
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -534,32 +541,32 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.all(7.0),
-                    child: SizedBox(
-                      height: 50,
-                      width: 300,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ClipOval(
-                              child: Image.network(
-                                'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
-                                height: 26,
-                                width: 26,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            const Text('Continue with Facebook'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(7.0),
+                  //   child: SizedBox(
+                  //     height: 50,
+                  //     width: 300,
+                  //     child: ElevatedButton(
+                  //       onPressed: () {},
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           ClipOval(
+                  //             child: Image.network(
+                  //               'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
+                  //               height: 26,
+                  //               width: 26,
+                  //             ),
+                  //           ),
+                  //           const SizedBox(
+                  //             width: 5,
+                  //           ),
+                  //           const Text('Continue with Facebook'),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -573,7 +580,7 @@ class _LoginPageState extends State<LoginPage> {
     if (keyform.currentState!.validate()) {
       showDialog(
           context: context,
-          barrierDismissible: false,
+          barrierDismissible: true,
           builder: (context) =>
               const Center(child: CircularProgressIndicator()));
       try {
@@ -583,7 +590,8 @@ class _LoginPageState extends State<LoginPage> {
 
         ///set the profile details on profile para di mag same before
         userprofile();
-        showErrorMessage('Successfully Logged In');
+        // String email = _emailController.text.trim();
+        // showErrorMessage('Successfully Logged In! User email: $email');
       } on FirebaseAuthException catch (e) {
         String errorMessage = e.code.toString();
         showErrorMessage(errorMessage);
@@ -591,35 +599,55 @@ class _LoginPageState extends State<LoginPage> {
       navigatorkey.currentState!.popUntil((route) => route.isFirst);
     }
   }
-}
 
-Future<void> userprofile() async {
-  final User = FirebaseAuth.instance.currentUser;
-  String userName = "";
-  String email = "";
-  if (User != null) {
+  Future googlelogin() async {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => const Center(child: CircularProgressIndicator()));
     try {
-      // Retrieve all documents from the 'Users' collection
-      DocumentSnapshot userDocument = await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(User.uid)
-          .get();
+      User? user = await _authService.signInWithGoogle();
 
-      // Iterate through each document in the collection
-      if (userDocument.exists) {
-        Map<String, dynamic> userData =
-            userDocument.data() as Map<String, dynamic>;
-        Profile profile = Profile();
-        profile.setname(userData['name']);
-        profile.setemail(userData['email']);
-        // Retrieve 'name' field from the document
-
-        // Here, you might want to match the user ID with the current user's ID
+      if (user != null) {
+        print('User signed in: ${user.displayName}');
+        // showErrorMessage('Successfully Logged In! User: ${user.displayName}');
+      } else {
+        // print('Sign-in failed');
+        showErrorMessage("Account not registered");
       }
     } catch (e) {
-      print("Error retrieving data: $e");
+      showErrorMessage('An unexpected error occurred. Please try again.');
     }
-  } else {
-    print("User not logged in");
+    navigatorkey.currentState!.popUntil((route) => route.isFirst);
+  }
+
+  Future<void> userprofile() async {
+    final User = FirebaseAuth.instance.currentUser;
+
+    if (User != null) {
+      try {
+        // Retrieve all documents from the 'Users' collection
+        DocumentSnapshot userDocument = await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(User.uid)
+            .get();
+
+        // Iterate through each document in the collection
+        if (userDocument.exists) {
+          Map<String, dynamic> userData =
+              userDocument.data() as Map<String, dynamic>;
+          Profile profile = Profile();
+          profile.setname(userData['name']);
+          profile.setemail(userData['email']);
+
+          // Retrieve 'name' field from the document
+          // Here, you might want to match the user ID with the current user's ID
+        }
+      } catch (e) {
+        print("Error retrieving data: $e");
+      }
+    } else {
+      print("User not logged in");
+    }
   }
 }
