@@ -37,7 +37,7 @@ class AllExpensesDashboard extends StatelessWidget {
               return displayrecords(
                 data: expensedata,
                 onSelect: () {
-                  print("tapped");
+                  // print("tapped");
                 },
               );
             },

@@ -24,12 +24,7 @@ class _NavigatorBarState extends State<NavigatorBar> {
     });
   }
 
-  var pages = [
-    const Dashboard(),
-    const Expenses(),
-    const Budget(),
-    const Profile()
-  ];
+  var pages = [const Dashboard(), const Expenses(), Budget(), const Profile()];
 
   @override
   Widget build(BuildContext context) {

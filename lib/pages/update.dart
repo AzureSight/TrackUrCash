@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/pages/Budget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,7 @@ class Update {
   final TextEditingController _dateController = TextEditingController();
   var uid = Uuid();
 
-  Future<void> submit(expensedata) async {
+  Future<void> submit(expensedata, context) async {
     // _expensedetailController.text = expensedata['detail'];
     final User = FirebaseAuth.instance.currentUser;
     // int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -25,13 +26,15 @@ class Update {
     // DateTime date = DateTime.now();
     // var id = uid.v4();
     // String monthyear = DateFormat("MMM y").format(date);
-    print(_expensedetailController.text.toString());
+    // print(_expensedetailController.text.toString());
 
     await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
 
     var data = {
       "id": expensedata['id'],
       "detail": detail,
+      "budget": expensedata['budget'],
+      "budget_id": expensedata['budget_id'],
       "amount": Amount,
       "timestamp": expensedata['timestamp'],
       "monthyear": expensedata['monthyear'],
@@ -42,6 +45,25 @@ class Update {
         .collection("expenses")
         .doc(expensedata['id'])
         .set(data);
+
+    // if (Budget.globalKey.currentState != null) {
+    //   Budget.globalKey.currentState?.refreshPage();
+    //   _expensedetailController.clear();
+    //   _amountController.clear();
+    //   _dateController.clear();
+    //   Navigator.pop(context);
+    // } else {
+    //   print("The Budget widget is not available (currentState is null).");
+    // }
+    // Clear form data
+    _expensedetailController.clear();
+    _amountController.clear();
+    _dateController.clear();
+    Navigator.pop(context);
+    // Optionally refresh the Budget page if a callback is provided
+    if (Budget.globalKey.currentState != null) {
+      Budget.globalKey.currentState?.refreshPage();
+    }
   }
 
   Future<double> computeTotalAmount() async {
@@ -84,7 +106,7 @@ class Update {
           key: _keyform,
           child: Container(
             width: 350,
-            height: 240,
+            height: 264,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,14 +335,14 @@ class Update {
                           // firestoreService
                           //     .addAmount(int.parse(_amountController.text));
                           if (_keyform.currentState!.validate()) {
-                            submit(expensedata);
+                            submit(expensedata, context);
                             //CLEAR THE TEXT CONTROLLER
-                            _expensedetailController.clear();
-                            _amountController.clear();
-                            _dateController.clear();
+                            // _expensedetailController.clear();
+                            // _amountController.clear();
+                            // _dateController.clear();
 
                             //CLOSE THE BOX
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
                           }
                         },
                         style: ElevatedButton.styleFrom(

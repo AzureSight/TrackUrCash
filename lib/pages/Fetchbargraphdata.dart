@@ -20,7 +20,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 50), () {
       getExpensesForCurrentWeek();
     }); // Fetch the expenses when the widget is initialized
   }
@@ -44,18 +44,18 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
     DateTime startOfThisWeek = DateTime(now.year, now.month, now.day).subtract(
         Duration(days: now.weekday - 1)); // Move back to Monday at 12:00 AM
-    print(startOfThisWeek);
+    // print(startOfThisWeek);
 
     DateTime endOfThisWeek = startOfThisWeek
         .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
-    print(endOfThisWeek);
+    // print(endOfThisWeek);
 
     // DateTime startOfThisWeekUTC = startOfThisWeek.toUtc();
     // DateTime endOfThisWeekUTC = endOfThisWeek.toUtc();
     // print(startOfThisWeekUTC);
     // print(endOfThisWeekUTC);
     try {
-      print("Querying for expenses");
+      // print("Querying for expenses");
 
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Users')
@@ -88,7 +88,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
         switch (expenseDate.weekday) {
           case DateTime.monday:
             tempMon += expenseAmount;
-            print("tempMon: $tempMon");
+            // print("tempMon: $tempMon");
             break;
           case DateTime.tuesday:
             tempTue += expenseAmount;
@@ -107,7 +107,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
             break;
           case DateTime.sunday:
             tempSun += expenseAmount;
-            print("tempSun: $tempSun");
+            // print("tempSun: $tempSun");
             break;
           default:
             break;
@@ -128,9 +128,9 @@ class _MyBarGraphState extends State<MyBarGraph> {
       backgroundColor: Colors.white,
       body: BarChart(
         BarChartData(
-            gridData: FlGridData(show: false),
+            gridData: const FlGridData(show: false),
             borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
+            titlesData: const FlTitlesData(
               show: true,
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
@@ -139,14 +139,35 @@ class _MyBarGraphState extends State<MyBarGraph> {
                   getTitlesWidget: getBottomTitles,
                 ),
               ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget:
+                      getLeftTitles, // You can define a custom widget for left titles
+                  reservedSize: 30,
+                  // Reserve space for the left titles
+                ),
+              ),
+              // leftTitles: AxisTitles(
+              //   sideTitles: SideTitles(
+              //     showTitles: true,
+              //     reservedSize: 40, // Reserve space for the left titles
+              //   ),
+              // ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: false,
+                  reservedSize: 60, // Hide right titles (optional)
+                ),
+              ),
             ),
             barGroups: [
               BarChartGroupData(x: 1, barRods: [
                 BarChartRodData(
                   fromY: 0,
                   toY: mon,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -154,8 +175,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: tue,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -163,8 +184,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: wed,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -172,8 +193,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: thur,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -181,8 +202,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: fri,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -190,8 +211,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: sat,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -199,8 +220,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: sun,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -247,6 +268,45 @@ Widget getBottomTitles(double value, TitleMeta meta) {
   );
 }
 
+String getFormattedValue(double value) {
+  // Format the value similar to how fl_chart does it
+  if (value >= 1000) {
+    return '${(value / 1000).toStringAsFixed(1)}k'; // Convert to k format
+  }
+  return value.toString(); // Return as is for lower values
+}
+
+Widget getLeftTitles(double value, TitleMeta meta) {
+  return Text(
+    getFormattedValue(value), // Use the custom formatting function
+    style: const TextStyle(
+      color: Colors.black, // Set your desired text color
+      fontSize: 11, // Set the desired smaller font size
+      fontWeight: FontWeight.normal, // Keep the default font weight
+    ),
+  );
+}
+// Widget getLeftTitles(double value, TitleMeta meta) {
+//   // Customize the title based on the value
+//   String title = value.toString(); // Convert the value to a string
+//   // You can add conditions for different title formats based on the value
+//   if (value == 0) {
+//     title = "0"; // Example for value 0
+//   } else if (value > 0) {
+//     title = "${value.toInt()}K"; // Add unit for positive values
+//   } else {
+//     title = "${value.toInt()}K"; // Different label for negative values
+//   }
+
+//   return Text(
+//     title,
+//     style: const TextStyle(
+//       color: Color(0xFF23CC71), // Customize the color
+//       fontSize: 10, // Customize the font size
+//       fontWeight: FontWeight.w500, // Customize the font weight
+//     ),
+//   );
+// }
 // double mons = 0.0;
 // double tues = 0.0;
 // double weds = 0.0;

@@ -3,6 +3,8 @@ import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,8 +12,23 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  NotificationService().initNotification();
+  // NotificationService().requestExactAlarmPermission();
+  // NotificationService().initNotification();
+  await initializeNotifications();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Manila'));
+  NotificationService().repeatNotification();
+  NotificationService().daily();
+  NotificationService().scheduleMyNotification();
   runApp(const MyApp());
+}
+
+// Ensure requestExactAlarmPermission is asynchronous and properly awaited.
+Future<void> initializeNotifications() async {
+  await NotificationService().initNotification();
+  await NotificationService()
+      .requestExactAlarmPermission(); // Await this method
+  // Then call initNotification
 }
 
 final navigatorkey = GlobalKey<NavigatorState>();

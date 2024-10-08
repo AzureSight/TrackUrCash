@@ -22,21 +22,21 @@ class BudgetGetter {
       activeBudgetDescription = activeBudgetDoc['budget_desc'];
     }
 
-    DateTime now = DateTime.now();
-    DateTime startOfToday =
-        DateTime(now.year, now.month, now.day); // Start of current day
-    DateTime endOfToday = DateTime(
-        now.year, now.month, now.day, 23, 59, 59); // End of current day
+    // DateTime now = DateTime.now();
+    // DateTime startOfToday =
+    //     DateTime(now.year, now.month, now.day); // Start of current day
+    // DateTime endOfToday = DateTime(
+    //     now.year, now.month, now.day, 23, 59, 59); // End of current day
     double totalAmount = 0;
     if (user != null) {
       QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
           .collection('Users')
           .doc(user.uid)
           .collection('expenses')
-          .where('timestamp',
-              isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
-          .where('timestamp',
-              isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isGreaterThanOrEqualTo: startOfToday.millisecondsSinceEpoch)
+          // .where('timestamp',
+          //     isLessThanOrEqualTo: endOfToday.millisecondsSinceEpoch)
           .where('budget', isEqualTo: activeBudgetDescription)
           .get();
 
@@ -46,7 +46,7 @@ class BudgetGetter {
         totalAmount += (expense['amount'] as num).toDouble();
       }
     }
-    print("HOW MUCH: $totalAmount");
+    // print("HOW MUCH: $totalAmount");
     return totalAmount;
   }
 
