@@ -27,14 +27,14 @@ String userName = "";
 String email = "";
 
 Future<void> userdetails() async {
-  final User = FirebaseAuth.instance.currentUser;
+  final user = FirebaseAuth.instance.currentUser;
 
-  if (User != null) {
+  if (user != null) {
     try {
       // Retrieve all documents from the 'Users' collection
       DocumentSnapshot userDocument = await FirebaseFirestore.instance
           .collection("Users")
-          .doc(User.uid)
+          .doc(user.uid)
           .get();
 
       // Iterate through each document in the collection
@@ -78,7 +78,7 @@ class _ProfileState extends State<Profile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [],
+        actions: const [],
         centerTitle: false,
         elevation: 2,
       ),
@@ -120,7 +120,7 @@ class _ProfileState extends State<Profile> {
                               border: Border.all(
                                   color: Colors.grey.shade300, width: 2),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(100)),
+                                  const BorderRadius.all(Radius.circular(100)),
                             ),
                             child: ClipOval(
                               child: Image.network(
@@ -140,13 +140,13 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                           Container(
-                            alignment: AlignmentDirectional(0, 0),
+                            alignment: const AlignmentDirectional(0, 0),
                             // decoration: BoxDecoration(
                             //   border: Border.all(
                             //       color: Colors.grey.shade300, width: 2),
                             //   borderRadius: BorderRadius.circular(12),
                             // ),
-                            padding: EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(16),
                             child: const Text(
                               '"A little saved today builds a lot for tomorrow."',
                               textAlign: TextAlign.center,
@@ -189,7 +189,7 @@ class _ProfileState extends State<Profile> {
                                           const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          print('Button pressed baa...');
+                                          // print('Button pressed baa...');
 
                                           FirebaseAuth.instance.signOut();
                                           navigatorkey.currentState!.popUntil(

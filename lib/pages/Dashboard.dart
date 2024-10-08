@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject_cst9l/notif/notif.dart';
 import 'package:finalproject_cst9l/pages/Transactionstoday.dart';
 import 'package:finalproject_cst9l/pages/Fetchbargraphdata.dart';
+import 'package:finalproject_cst9l/pages/bargraphweek.dart';
 import 'package:finalproject_cst9l/pages/fetchweeklydata.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +23,7 @@ class Dashboard extends StatefulWidget {
 //   return totalAsString;
 // }
 
-Future<double> Caltotal() async {
+Future<double> caltotal() async {
   final User? user = FirebaseAuth.instance.currentUser;
   DateTime now = DateTime.now();
   DateTime startOfToday =
@@ -127,10 +128,12 @@ Future<double> fetchactiveexpenses() async {
 // }
 
 class _DashboardState extends State<Dashboard> {
-  int _currentPage = 1;
+  // int _currentPage = 1;
   double tot = 0;
   double atot = 0;
   double wtot = 0;
+  int _selectedIndex = 0; // 0 for Daily, 1 for Weekly
+
   @override
   void initState() {
     super.initState();
@@ -143,7 +146,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> initializeTotal() async {
-    double totalweek = await Caltotal();
+    double totalweek = await caltotal();
     double activeTotal = await fetchactiveexpenses();
     ExpenseService expenseService = ExpenseService();
     double totalExpenses = await expenseService.getExpensesForCurrentWeek();
@@ -188,7 +191,7 @@ class _DashboardState extends State<Dashboard> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [],
+        actions: const [],
         centerTitle: false,
         elevation: 2,
       ),
@@ -196,12 +199,12 @@ class _DashboardState extends State<Dashboard> {
         children: [
           //MY EXPENSES CONTAINER HERE
           Align(
-            alignment: AlignmentDirectional(0.00, 0.00),
+            alignment: const AlignmentDirectional(0.00, 0.00),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
               child: Container(
                 width: 500,
-                height: 190,
+                height: 195,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -227,8 +230,9 @@ class _DashboardState extends State<Dashboard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
+                        Row(
                           mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Align(
                               alignment: AlignmentDirectional(-1.00, -1.00),
@@ -244,6 +248,12 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                 ),
                               ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.wallet),
+                              iconSize: 40,
+                              color: const Color.fromARGB(255, 52, 52, 52),
+                              onPressed: () {},
                             ),
                             // Align(
                             //   alignment: AlignmentDirectional(-1.00, -1.00),
@@ -261,40 +271,39 @@ class _DashboardState extends State<Dashboard> {
 
                             //   ),
                             // ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                    child: Text(
-                                      'This day',
-                                      style: TextStyle(
-                                        fontFamily: 'Manrope',
-                                        color: Color(0xFF2E2863),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    // '₱$tot',
-                                    formattedtot,
-                                    //'₱'
-                                    style: const TextStyle(
-                                      fontFamily: 'Manrope',
-                                      color: Color(0xFF23cc71),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                child: Text(
+                                  'This day',
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    color: Color(0xFF2E2863),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                // '₱$tot',
+                                formattedtot,
+                                //'₱'
+                                style: const TextStyle(
+                                  fontFamily: 'Manrope',
+                                  color: Color(0xFF23cc71),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const Divider(
                           thickness: 1,
@@ -380,7 +389,7 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
               child: Container(
                 width: 500,
-                height: 415,
+                height: 420,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: const [
@@ -406,60 +415,69 @@ class _DashboardState extends State<Dashboard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Column(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment
+                              .spaceBetween, // Space between title and toggle buttons
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            const Padding(
+                              padding: EdgeInsets.fromLTRB(5, 8, 30, 10),
                               child: Text(
                                 'Spending Report',
                                 style: TextStyle(
                                   fontFamily: 'Raleway',
                                   color: Color(0xFF001F3F),
-                                  fontSize: 30,
+                                  fontSize: 25,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ),
-                            // Add some spacing or divider between the title and container if needed
-                            // const SizedBox(width: 10),
-                            // Container(
-                            //   width: 245,
-                            //   padding:
-                            //       const EdgeInsets.symmetric(horizontal: 10),
-                            //   decoration: BoxDecoration(
-                            //     borderRadius: BorderRadius.circular(8),
-                            //     color: Colors.grey[
-                            //         200], // Optional: Background color for the container
-                            //   ),
-                            //   child: Row(
-                            //     mainAxisAlignment: MainAxisAlignment.center,
-                            //     children: [
-                            //       // IconButton(
-                            //       //   icon: const Icon(Icons.chevron_left),
-                            //       //   onPressed: () {
-                            //       //     // Your left button logic
-                            //       //   },
-                            //       // ),
-                            //       const Text(
-                            //         'Weekly Report',
-                            //         style: TextStyle(
-                            //           fontFamily: 'Raleway',
-                            //           fontSize: 18,
-                            //           fontWeight: FontWeight.bold,
-                            //         ),
-                            //       ),
-                            //       // IconButton(
-                            //       //   icon: const Icon(Icons.chevron_right),
-                            //       //   onPressed: () {
-                            //       //     // Your right button logic
-                            //       //   },
-                            //       // ),
-                            //     ],
-                            //   ),
-                            // ),
+                            const SizedBox(
+                                height:
+                                    20), // Add some space between the title and toggle buttons
+                            Center(
+                              // Center the ToggleButtons
+                              child: ToggleButtons(
+                                isSelected: [
+                                  _selectedIndex == 0,
+                                  _selectedIndex == 1,
+                                ],
+                                onPressed: (int index) {
+                                  setState(() {
+                                    _selectedIndex = index;
+                                  });
+                                },
+                                fillColor: const Color(
+                                    0xFF23cc71), // Background color when selected
+                                selectedColor:
+                                    Colors.white, // Icon color when selected
+                                selectedBorderColor:
+                                    Colors.white, // Border color when selected
+                                borderRadius: BorderRadius.circular(8.0),
+                                children: const [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Icon(Icons
+                                        .today_outlined), // Use an icon for Daily Expenses
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Icon(Icons.calendar_month_outlined),
+                                    // Use an icon for Weekly Expenses
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                           ],
                         ),
+                        if (_selectedIndex == 0) ...[
+                          const Text('Showing Daily Expenses for this Week'),
+                        ] else ...[
+                          const Text('Showing Weekly Expenses for this Month'),
+                        ],
                         const Divider(
                           thickness: 1.5,
                           color: Color(0xFFBDC3C7),
@@ -468,7 +486,9 @@ class _DashboardState extends State<Dashboard> {
                           padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                           child: SizedBox(
                             height: 290,
-                            child: MyBarGraph(),
+                            child: _selectedIndex == 0
+                                ? MyBarGraph() // Show MyBarGraph for daily expenses
+                                : MyBarGraphweek(), // Show MonthlyBarGraph for weekly expenses
                           ),
                         ),
                       ],

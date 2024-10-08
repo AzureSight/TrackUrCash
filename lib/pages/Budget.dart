@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:uuid/uuid.dart';
 
 //import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -371,7 +372,7 @@ class _BudgetState extends State<Budget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        content: Container(
+        content: SizedBox(
           width: 500,
           height: 259,
           child: Column(
@@ -380,9 +381,9 @@ class _BudgetState extends State<Budget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               //DIALOG TITLE HERE
-              Container(
+              const SizedBox(
                 height: 35,
-                child: const Text(
+                child: Text(
                   'Update Budget',
                   style: TextStyle(
                     fontFamily: 'Ubuntu',
@@ -656,7 +657,7 @@ class _BudgetState extends State<Budget> {
 
         if (userDocument.docs.isNotEmpty) {
           var activeBudget = userDocument.docs.first;
-          print("Active Budget Data: ${activeBudget.data()}");
+          // print("Active Budget Data: ${activeBudget.data()}");
           Map<String, dynamic> userData =
               activeBudget.data() as Map<String, dynamic>;
 
@@ -792,7 +793,7 @@ class _BudgetState extends State<Budget> {
         _budgetController.clear();
         _budgetdetailController.clear();
 
-        print("New budget added and existing budgets updated to 'completed'.");
+        // print("New budget added and existing budgets updated to 'completed'.");
       } catch (e) {
         print("Error retrieving data: $e");
       }
@@ -830,7 +831,7 @@ class _BudgetState extends State<Budget> {
           // Retrieve the first (and only) active budget document
           DocumentSnapshot activeBudgetDoc = activeBudgetQuery.docs.first;
           olddesc = activeBudgetDoc['budget_desc'];
-          print("THIS IS THE OLD DESCRIPTION$olddesc");
+          // print("THIS IS THE OLD DESCRIPTION$olddesc");
           // Update the active budget's amount and description
           await activeBudgetDoc.reference.update({
             'budget_amount': amount,
@@ -854,7 +855,7 @@ class _BudgetState extends State<Budget> {
 
           _budgetController.clear();
           _budgetdetailController.clear();
-          print("Active budget updated successfully.");
+          // print("Active budget updated successfully.");
         } else {
           print("No active budget found.");
         }
@@ -955,7 +956,7 @@ class _BudgetState extends State<Budget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Expenses$tot");
+    // print("Expenses$tot");
     if (budget == 0) {
       remaining = 0;
     } else {
@@ -981,7 +982,7 @@ class _BudgetState extends State<Budget> {
     ).format(remaining);
 
     double roundedRemaining = double.parse(remaining.toStringAsFixed(2));
-    double savings = remaining;
+    // double savings = remaining;
     double expensePercentage = (tot / budget) * 100;
     // Lists of messages
     List<String> withinBudgetMessages = [
@@ -1333,11 +1334,11 @@ class _BudgetState extends State<Budget> {
                       children: [
                         Column(
                           children: [
-                            const Row(
+                            Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Align(
+                                const Align(
                                   alignment: AlignmentDirectional(-1.00, -1.00),
                                   child: Text(
                                     'My Budget',
@@ -1349,6 +1350,23 @@ class _BudgetState extends State<Budget> {
                                     ),
                                   ),
                                 ),
+                                IconButton(
+                                  icon:
+                                      const Icon(Icons.account_balance_wallet),
+                                  iconSize: 40,
+                                  color: const Color.fromARGB(255, 52, 52, 52),
+                                  onPressed: () {},
+                                ),
+                                // IconButton(
+                                //   icon: SvgPicture.asset(
+                                //     'assets/images/coin.svg', // Path to your paper money SVG asset
+                                //     width: 40,
+                                //     height: 40,
+                                //     // color: Colors.green,
+                                //   ),
+                                //   iconSize: 40,
+                                //   onPressed: () {},
+                                // ),
                               ],
                             ),
                             Row(
@@ -1977,11 +1995,11 @@ class _BudgetState extends State<Budget> {
                                                         .spaceEvenly,
                                                 children: [
                                                   //DIALOG TITLE HERE
-                                                  Row(
+                                                  const Row(
                                                     children: [
-                                                      Container(
+                                                      SizedBox(
                                                         height: 40,
-                                                        child: const Text(
+                                                        child: Text(
                                                           'Complete Budget?',
                                                           style: TextStyle(
                                                             fontFamily:
@@ -2003,9 +2021,9 @@ class _BudgetState extends State<Budget> {
                                                   ),
                                                   const SizedBox(height: 10),
                                                   //TEXT BODY DIALOG
-                                                  Container(
+                                                  const SizedBox(
                                                     height: 50,
-                                                    child: const Center(
+                                                    child: Center(
                                                       child: Text(
                                                         'Do you want to complete this budget?',
                                                         style: TextStyle(

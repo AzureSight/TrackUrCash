@@ -13,7 +13,7 @@ class ExpenseService {
 
     double total = 0;
     try {
-      print("Querying for expenses");
+      // print("Querying for expenses");
 
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Users')
@@ -33,7 +33,7 @@ class ExpenseService {
     } catch (e) {
       print('Error fetching expenses: $e');
     }
-    print("Total expenses for the week: $total");
+    // print("Total expenses for the week: $total");
     return total;
   }
 }

@@ -46,7 +46,7 @@ class BudgetGetter {
         totalAmount += (expense['amount'] as num).toDouble();
       }
     }
-    print("HOW MUCH: $totalAmount");
+    // print("HOW MUCH: $totalAmount");
     return totalAmount;
   }
 

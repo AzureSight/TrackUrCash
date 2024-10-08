@@ -49,6 +49,7 @@ dependencies:
   # dropdown_search: ^6.0.1
   flutter_typeahead: ^4.0.0
   dropdown_search: ^5.0.5
+  flutter_svg: ^1.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,6 +80,8 @@ assets:
   - assets/images/User.png
   - images/facebook.png
   - images/google.png
+  - assets/paper_money.svg
+  - assets/images/coin.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

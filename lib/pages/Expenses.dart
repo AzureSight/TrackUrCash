@@ -25,25 +25,25 @@ class _ExpensesState extends State<Expenses> {
       TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  var uid = Uuid();
+  var uid = const Uuid();
   double? selectedtotalAmount;
   Future<void> submit() async {
-    final User = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
     // DateTime now = DateTime.now().toUtc().add(Duration(hours: 8));
     // // Use the adjusted DateTime to get the milliseconds since epoch
     // int timestamp = now.millisecondsSinceEpoch;
 
     int timestamp = DateTime.now().millisecondsSinceEpoch;
-    print(timestamp);
+    // print(timestamp);
     String detail = _expensedetailController.text.toString();
     // ignore: non_constant_identifier_names
     var Amount = double.parse(_amountController.text);
     DateTime date = DateTime.now();
     var id = uid.v4();
     String monthyear = DateFormat("MMM y").format(date);
-    print(_expensedetailController.text.toString());
-    await FirebaseFirestore.instance.collection('Users').doc(User!.uid).get();
+    // print(_expensedetailController.text.toString());
+    await FirebaseFirestore.instance.collection('Users').doc(user!.uid).get();
 
     // QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
     //     .collection('Users')
@@ -66,7 +66,7 @@ class _ExpensesState extends State<Expenses> {
 
     QuerySnapshot activeBudgetQuery = await FirebaseFirestore.instance
         .collection('Users')
-        .doc(User.uid)
+        .doc(user.uid)
         .collection('budget')
         .where('status', isEqualTo: 'active')
         .limit(1) // We expect only one active budget at a time
@@ -97,7 +97,7 @@ class _ExpensesState extends State<Expenses> {
     };
     await FirebaseFirestore.instance
         .collection("Users")
-        .doc(User.uid)
+        .doc(user.uid)
         .collection("expenses")
         .doc(id)
         .set(data);
@@ -139,7 +139,7 @@ class _ExpensesState extends State<Expenses> {
       builder: (context) => AlertDialog(
         content: Form(
           key: _keyform,
-          child: Container(
+          child: SizedBox(
             width: 350,
             height: 300,
             child: Column(
@@ -148,9 +148,9 @@ class _ExpensesState extends State<Expenses> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 //DIALOG TITLE HERE
-                Container(
+                const SizedBox(
                   height: 30,
-                  child: const Text(
+                  child: Text(
                     'Add Expense',
                     style: TextStyle(
                       fontFamily: 'Ubuntu',
@@ -640,6 +640,8 @@ class _ExpensesState extends State<Expenses> {
                                   IconButton(
                                     icon: const Icon(Icons.edit),
                                     iconSize: 40,
+                                    color:
+                                        const Color.fromARGB(255, 52, 52, 52),
                                     onPressed: () {
                                       // print('IconButton pressed ...');
                                     },
@@ -717,6 +719,8 @@ class _ExpensesState extends State<Expenses> {
                                   IconButton(
                                     icon: const Icon(Icons.edit),
                                     iconSize: 40,
+                                    color:
+                                        const Color.fromARGB(255, 52, 52, 52),
                                     onPressed: () {
                                       // print('IconButton pressed ...');
                                     },
@@ -924,6 +928,7 @@ class _ExpensesState extends State<Expenses> {
                                 height:
                                     290, // Replace with an appropriate fixed height
                                 child: BudgetExpenses(id: selectedBudget),
+                                // Allexpenses(),
                               ),
                             ],
                           ),
@@ -1090,7 +1095,7 @@ class Todaytransactions extends StatelessWidget {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        content: Container(
+                        content: SizedBox(
                           width: 300,
                           height: 200,
                           child: Column(
@@ -1137,9 +1142,9 @@ class Todaytransactions extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               //TEXT BODY DIALOG
-                              Container(
+                              const SizedBox(
                                 height: 30,
-                                child: const Center(
+                                child: Center(
                                   child: Text(
                                     'Would you like to:',
                                     style: TextStyle(
@@ -1183,7 +1188,7 @@ class Todaytransactions extends StatelessWidget {
                                           context: context,
                                           builder: (BuildContext context) {
                                             return AlertDialog(
-                                              content: Container(
+                                              content: SizedBox(
                                                 width: 300,
                                                 height: 200,
                                                 child: Column(
@@ -1196,11 +1201,11 @@ class Todaytransactions extends StatelessWidget {
                                                           .spaceEvenly,
                                                   children: [
                                                     //DIALOG TITLE HERE
-                                                    Row(
+                                                    const Row(
                                                       children: [
-                                                        Container(
+                                                        SizedBox(
                                                           height: 40,
-                                                          child: const Text(
+                                                          child: Text(
                                                             'Delete Item?',
                                                             style: TextStyle(
                                                               fontFamily:
@@ -1223,9 +1228,9 @@ class Todaytransactions extends StatelessWidget {
                                                     ),
                                                     const SizedBox(height: 10),
                                                     //TEXT BODY DIALOG
-                                                    Container(
+                                                    const SizedBox(
                                                       height: 50,
-                                                      child: const Center(
+                                                      child: Center(
                                                         child: Text(
                                                           'Do you want to delete this item?',
                                                           style: TextStyle(
@@ -1346,8 +1351,8 @@ class Todaytransactions extends StatelessWidget {
                                                                           'id'])
                                                                   .delete();
 
-                                                              print(
-                                                                  "Deleteddddddddd");
+                                                              // print(
+                                                              //     "Deleteddddddddd");
                                                               // Close dialog
                                                             },
                                                             style:
@@ -1535,6 +1540,7 @@ class Todaytransactions extends StatelessWidget {
         });
   }
 }
+
 // ------------------------------------------------------------------------------ WITH UPDATE TO SIYA AND ALL EXPENSE LANG ------------------------------------------------------------------------------
 // class Allexpenses extends StatelessWidget {
 //   Allexpenses({
@@ -2039,7 +2045,7 @@ class BudgetExpenses extends StatelessWidget {
             .collection('Users')
             .doc(userid)
             .collection('expenses')
-            .orderBy("timestamp", descending: false)
+            .orderBy("timestamp", descending: true)
         : (id == '0')
             ? FirebaseFirestore.instance
                 .collection('Users')

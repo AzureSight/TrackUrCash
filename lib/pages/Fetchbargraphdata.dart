@@ -20,7 +20,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 50), () {
       getExpensesForCurrentWeek();
     }); // Fetch the expenses when the widget is initialized
   }
@@ -44,18 +44,18 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
     DateTime startOfThisWeek = DateTime(now.year, now.month, now.day).subtract(
         Duration(days: now.weekday - 1)); // Move back to Monday at 12:00 AM
-    print(startOfThisWeek);
+    // print(startOfThisWeek);
 
     DateTime endOfThisWeek = startOfThisWeek
         .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
-    print(endOfThisWeek);
+    // print(endOfThisWeek);
 
     // DateTime startOfThisWeekUTC = startOfThisWeek.toUtc();
     // DateTime endOfThisWeekUTC = endOfThisWeek.toUtc();
     // print(startOfThisWeekUTC);
     // print(endOfThisWeekUTC);
     try {
-      print("Querying for expenses");
+      // print("Querying for expenses");
 
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Users')
@@ -88,7 +88,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
         switch (expenseDate.weekday) {
           case DateTime.monday:
             tempMon += expenseAmount;
-            print("tempMon: $tempMon");
+            // print("tempMon: $tempMon");
             break;
           case DateTime.tuesday:
             tempTue += expenseAmount;
@@ -107,7 +107,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
             break;
           case DateTime.sunday:
             tempSun += expenseAmount;
-            print("tempSun: $tempSun");
+            // print("tempSun: $tempSun");
             break;
           default:
             break;
@@ -128,7 +128,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
       backgroundColor: Colors.white,
       body: BarChart(
         BarChartData(
-            gridData: FlGridData(show: false),
+            gridData: const FlGridData(show: false),
             borderData: FlBorderData(show: false),
             titlesData: const FlTitlesData(
               show: true,
@@ -166,8 +166,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: mon,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -175,8 +175,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: tue,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -184,8 +184,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: wed,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -193,8 +193,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: thur,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -202,8 +202,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: fri,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -211,8 +211,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: sat,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
@@ -220,8 +220,8 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 BarChartRodData(
                   fromY: 0,
                   toY: sun,
-                  width: 20,
-                  color: Color(0xFF23CC71),
+                  width: 22,
+                  color: const Color(0xFF23CC71),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ]),
