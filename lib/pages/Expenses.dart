@@ -26,7 +26,7 @@ class _ExpensesState extends State<Expenses> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   var uid = Uuid();
-
+  double? selectedtotalAmount;
   Future<void> submit() async {
     final User = FirebaseAuth.instance.currentUser;
 
@@ -425,6 +425,7 @@ class _ExpensesState extends State<Expenses> {
 
   Future<void> initialize() async {
     await fetchBudgetOptions();
+    await _fetchTotalAmount();
     setState(() {});
   }
 
@@ -477,7 +478,7 @@ class _ExpensesState extends State<Expenses> {
             .doc(user.uid)
             .collection("budget")
             .orderBy('created_at', descending: true)
-            .limit(5)
+            // .limit(5)
             .get();
 
         setState(() {
@@ -512,8 +513,27 @@ class _ExpensesState extends State<Expenses> {
     }
   }
 
+  Future<void> _fetchTotalAmount() async {
+    String? budgetId = selectedBudget;
+
+    TotalExpense totalExpense = TotalExpense(id: budgetId);
+    try {
+      double total = await totalExpense.getTotal();
+      setState(() {
+        selectedtotalAmount = total;
+      });
+    } catch (e) {
+      print('Failed to get total amount: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    String formattedSelectedTotalExpense = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    ).format(selectedtotalAmount ?? 0.0);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF23cc71),
@@ -751,32 +771,146 @@ class _ExpensesState extends State<Expenses> {
                                   //   ),
                                   // ),
                                   // //dropdownold
+
+                                  // Padding(
+                                  //   padding:
+                                  //       const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  //   child: DropdownButton<String>(
+                                  //     // Display the selected value or hint if none is selected
+                                  //     value: selectedBudget,
+                                  //     hint: const Text(
+                                  //         "Select Budget Description"),
+                                  //     onChanged: (String? newValue) {
+                                  //       setState(() {
+                                  //         // print("$newValue");
+                                  //         selectedBudget = newValue;
+
+                                  //         // Update the selected value (doc_id)
+                                  //       });
+                                  //     },
+                                  //     items: budgetOptions
+                                  //         .map<DropdownMenuItem<String>>(
+                                  //             (Map<String, String> budget) {
+                                  //       return DropdownMenuItem<String>(
+                                  //         value: budget[
+                                  //             'doc_id'], // Use doc_id as the value
+                                  //         child: Text(budget[
+                                  //             'budget_desc']!), // Display the budget_desc in the dropdown
+                                  //       );
+                                  //     }).toList(),
+                                  //   ),
+                                  // ),
+
                                   Padding(
                                     padding:
-                                        const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                    child: DropdownButton<String>(
-                                      // Display the selected value or hint if none is selected
-                                      value: selectedBudget,
-                                      hint: const Text(
-                                          "Select Budget Description"),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          // print("$newValue");
-                                          selectedBudget = newValue;
+                                        const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final RenderBox button = context
+                                            .findRenderObject() as RenderBox;
+                                        final Offset buttonPosition =
+                                            button.localToGlobal(Offset.zero);
+                                        final Size buttonSize = button.size;
 
-                                          // Update the selected value (doc_id)
-                                        });
-                                      },
-                                      items: budgetOptions
-                                          .map<DropdownMenuItem<String>>(
-                                              (Map<String, String> budget) {
-                                        return DropdownMenuItem<String>(
-                                          value: budget[
-                                              'doc_id'], // Use doc_id as the value
-                                          child: Text(budget[
-                                              'budget_desc']!), // Display the budget_desc in the dropdown
+                                        final double dropdownX =
+                                            buttonPosition.dx + 30;
+                                        final double dropdownY =
+                                            buttonPosition.dy + 318;
+
+                                        final selected = await showMenu(
+                                          context: context,
+                                          position: RelativeRect.fromLTRB(
+                                            dropdownX, // Adjusted x position
+                                            dropdownY, // Position below the button
+                                            buttonPosition.dx +
+                                                buttonSize
+                                                    .width, // Set width based on button size
+                                            0, // No bottom position needed
+                                          ),
+                                          items: [
+                                            PopupMenuItem<String>(
+                                              child: SizedBox(
+                                                height: 250,
+                                                width: 200,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: budgetOptions.map(
+                                                        (Map<String, String>
+                                                            budget) {
+                                                      return ListTile(
+                                                        title: Text(budget[
+                                                            'budget_desc']!),
+                                                        onTap: () {
+                                                          Navigator.pop(context,
+                                                              budget['doc_id']);
+                                                        },
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         );
-                                      }).toList(),
+
+                                        if (selected != null) {
+                                          setState(() {
+                                            selectedBudget = selected;
+                                            _fetchTotalAmount();
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          // children: [
+                                          //   Text(
+                                          //     selectedBudget == 'null'
+                                          //         ? "All Budgets"
+                                          //         : budgetOptions.firstWhere(
+                                          //             (option) =>
+                                          //                 option['doc_id'] ==
+                                          //                 selectedBudget,
+                                          //             orElse: () => {
+                                          //                   'budget_desc':
+                                          //                       'Unknown Budget'
+                                          //                 })['budget_desc']!,
+                                          //   ),
+                                          //   const Icon(Icons.arrow_drop_down),
+                                          // ],
+                                          children: [
+                                            Text(
+                                              budgetOptions.firstWhere(
+                                                  (option) =>
+                                                      option['doc_id'] ==
+                                                      selectedBudget,
+                                                  orElse: () => {
+                                                        'budget_desc':
+                                                            'Unknown Budget'
+                                                      })['budget_desc']!,
+                                            ),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    // '₱$budget', // Ensure 'tot' is passed to the widget
+                                    formattedSelectedTotalExpense,
+                                    style: const TextStyle(
+                                      fontFamily: 'Manrope',
+                                      color: Color(0xFF23cc71),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
@@ -1893,7 +2027,7 @@ class BudgetExpenses extends StatelessWidget {
 
   final userid = FirebaseAuth.instance.currentUser!.uid;
   Update up = Update();
-
+  double totalAmount = 0.0;
   @override
   Widget build(BuildContext context) {
     // print('THE SELECTED is $id');
@@ -1934,6 +2068,15 @@ class BudgetExpenses extends StatelessWidget {
           }
 
           var data = snapshot.data!.docs;
+
+          // for (var expensedata in data) {
+          //   final amount = (expensedata['amount'] as num).toDouble();
+
+          //   totalAmount += amount;
+          // }
+
+          // TotalExpense(totalAmount: totalAmount);
+
           return ListView.builder(
             shrinkWrap: true,
             itemCount: data.length,
@@ -1948,5 +2091,71 @@ class BudgetExpenses extends StatelessWidget {
             },
           );
         });
+  }
+}
+
+// class TotalExpense {
+//   final double totalAmount;
+
+//   TotalExpense({required this.totalAmount});
+
+//   double getTotal() {
+//     return totalAmount;
+//   }
+// }
+
+class TotalExpense {
+  final String? id;
+
+  TotalExpense({required this.id});
+
+  final String userid = FirebaseAuth.instance.currentUser!.uid;
+
+  Future<double> getTotal() async {
+    double totalAmount = 0.0;
+
+    try {
+      // Determine the query based on the id
+      final query = (id == 'null' || id == null)
+          ? FirebaseFirestore.instance
+              .collection('Users')
+              .doc(userid)
+              .collection('expenses')
+              .orderBy("timestamp", descending: false)
+          : (id == '0')
+              ? FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(userid)
+                  .collection('expenses')
+                  .where('budget_id', isEqualTo: 'No available id')
+                  .orderBy("timestamp", descending: true)
+              : FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(userid)
+                  .collection('expenses')
+                  .where('budget_id', isEqualTo: id)
+                  .orderBy("timestamp", descending: true);
+
+      // Fetch the snapshots
+      QuerySnapshot snapshot = await query.get();
+
+      // Check if snapshot contains any documents
+      if (snapshot.docs.isEmpty) {
+        throw Exception("No records found for the given budget ID.");
+      }
+
+      // Calculate the total amount
+      for (var expensedata in snapshot.docs) {
+        final amount = (expensedata['amount'] as num?)
+            ?.toDouble(); // Cast to double and handle null
+        if (amount != null) {
+          totalAmount += amount; // Sum the amounts
+        }
+      }
+    } catch (e) {
+      print('Error retrieving total amount: $e');
+    }
+
+    return totalAmount;
   }
 }
