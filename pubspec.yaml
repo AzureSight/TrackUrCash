@@ -49,6 +49,7 @@ dependencies:
   # dropdown_search: ^6.0.1
   flutter_typeahead: ^4.0.0
   dropdown_search: ^5.0.5
+  google_sign_in: ^6.2.1
   flutter_svg: ^1.0.3
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalproject_cst9l/auth/auth_service.dart';
 import 'package:finalproject_cst9l/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -192,6 +193,9 @@ class _ProfileState extends State<Profile> {
                                           // print('Button pressed baa...');
 
                                           FirebaseAuth.instance.signOut();
+                                          final AuthService authService =
+                                              AuthService();
+                                          authService.signOut();
                                           navigatorkey.currentState!.popUntil(
                                               (route) => route.isFirst);
                                           //     Navigator.pop(context);
