@@ -605,13 +605,18 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         barrierDismissible: true,
         builder: (context) => const Center(child: CircularProgressIndicator()));
-    User? user = await _authService.signInWithGoogle();
+    try {
+      User? user = await _authService.signInWithGoogle();
 
-    if (user != null) {
-      print('User signed in: ${user.displayName}');
-      // showErrorMessage('Successfully Logged In! User: ${user.displayName}');
-    } else {
-      print('Sign-in failed');
+      if (user != null) {
+        print('User signed in: ${user.displayName}');
+        // showErrorMessage('Successfully Logged In! User: ${user.displayName}');
+      } else {
+        // print('Sign-in failed');
+        showErrorMessage("Account not registered");
+      }
+    } catch (e) {
+      showErrorMessage('An unexpected error occurred. Please try again.');
     }
     navigatorkey.currentState!.popUntil((route) => route.isFirst);
   }
