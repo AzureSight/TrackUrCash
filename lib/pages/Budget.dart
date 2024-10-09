@@ -919,13 +919,25 @@ class _BudgetState extends State<Budget> {
           // //   // 'budget_id': null, // gigamit para lang sa kulang na field if nagupdate sa database
           // // });
 
-          if (expenseBudgetDesc.endsWith(' - completed')) {
+          // if (expenseBudgetDesc.endsWith(' - completed')) {
+          //   expenseBudgetDesc =
+          //       expenseBudgetDesc.substring(0, expenseBudgetDesc.length - 12);
+          // }
+
+          // batch2.update(
+          //     doc.reference, {'budget': '$expenseBudgetDesc - completed'});
+
+          if (expenseBudgetDesc != "Uncategorized" &&
+              expenseBudgetDesc.endsWith(' - completed')) {
             expenseBudgetDesc =
                 expenseBudgetDesc.substring(0, expenseBudgetDesc.length - 12);
           }
 
-          batch2.update(
-              doc.reference, {'budget': '$expenseBudgetDesc - completed'});
+          batch2.update(doc.reference, {
+            'budget': expenseBudgetDesc == "Uncategorized"
+                ? expenseBudgetDesc
+                : '$expenseBudgetDesc - completed'
+          });
         }
         await batch2.commit();
         getbudget();
