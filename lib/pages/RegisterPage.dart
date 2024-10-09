@@ -1,6 +1,7 @@
 //import 'package:finalproj/pages/sample.dart';
 import 'dart:async';
 
+import 'package:finalproject_cst9l/auth/auth_service.dart';
 import 'package:finalproject_cst9l/main.dart';
 import 'package:finalproject_cst9l/pages/Profile.dart';
 
@@ -24,6 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String email = "";
   String password = "";
   String confirmPass = "";
+  final AuthService _authService = AuthService();
 
   final GlobalKey<FormState> _keyform = GlobalKey<FormState>();
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -133,17 +135,18 @@ class _RegisterPageState extends State<RegisterPage> {
       // );
       if (passconfirmed()) {
         try {
+          showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) =>
+                  const Center(child: CircularProgressIndicator()));
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
             // email: data['email'],
             // password: data['password'],
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) =>
-                  const Center(child: CircularProgressIndicator()));
+
           updateProfileDetails();
           showErrorMessage('Successfully Logged In');
           await FirestoreService().createUser(
@@ -155,6 +158,29 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     }
 
+    navigatorkey.currentState!.popUntil((route) => route.isFirst);
+  }
+
+  Future googlesignup() async {
+    try {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()));
+
+      User? user = await _authService.signUPWithGoogle();
+
+      if (user != null) {
+        print('Signed-up Sucessfully: ${user.displayName}');
+        // showErrorMessage('Successfully Logged In! User: ${user.displayName}');
+      } else {
+        // print('Sign-in failed');
+        showErrorMessage("Google Account Already Exists");
+      }
+    } catch (e) {
+      showErrorMessage('An unexpected error occurred. Please try again.');
+    }
     navigatorkey.currentState!.popUntil((route) => route.isFirst);
   }
 
@@ -177,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 10, 8, 15),
+                  padding: const EdgeInsets.fromLTRB(8, 70, 8, 15),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -652,7 +678,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       //Elevated Button_Register
                       Padding(
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                            const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 25),
                         child: ElevatedButton(
                           onPressed: () {
                             // registerUser(_emailController.text.trim(),
@@ -663,10 +689,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             print('Button pressed ...');
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF23cc71),
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                            fixedSize: Size(300, 50),
+                            backgroundColor: const Color(0xFF23cc71),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                24, 0, 24, 0),
+                            fixedSize: const Size(300, 50),
                           ),
                           child: isloader
                               ? const Center(child: CircularProgressIndicator())
@@ -716,12 +742,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       //GOOGLE AND FACEBOOK SIGN IN
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(top: 25, bottom: 8),
                         child: SizedBox(
                           height: 50,
                           width: 300,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              googlesignup();
+                            },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -742,32 +770,32 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
 
-                      Padding(
-                        padding: const EdgeInsets.all(7.0),
-                        child: SizedBox(
-                          height: 50,
-                          width: 300,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ClipOval(
-                                  child: Image.network(
-                                    'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
-                                    height: 26,
-                                    width: 26,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text('Continue with Facebook'),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(7.0),
+                      //   child: SizedBox(
+                      //     height: 50,
+                      //     width: 300,
+                      //     child: ElevatedButton(
+                      //       onPressed: () {},
+                      //       child: Row(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         children: [
+                      //           ClipOval(
+                      //             child: Image.network(
+                      //               'https://img.icons8.com/color/48/facebook-new.png', // Replace with the path to your Google logo image asset
+                      //               height: 26,
+                      //               width: 26,
+                      //             ),
+                      //           ),
+                      //           const SizedBox(
+                      //             width: 5,
+                      //           ),
+                      //           const Text('Continue with Facebook'),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.center,
                       //   children: [
